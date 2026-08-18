@@ -37,6 +37,7 @@ The solution supports **operational and financial decision support rather than c
 - **30+ SQL analyses** across claims operations, finance, providers, population health, and payment integrity
 - **Six reproducible BI-ready marts** and matching dashboard previews
 - **Working dimensional star schema** with Snowflake deployment and quality-check SQL
+- **Power BI Desktop project source** with a Snowflake semantic model, 16 DAX measures, five report pages, theme, and build specification
 - **Configurable scale profiles** for approximately 40K, 300K, or 1M base claims
 - **Synthetic 837/835 adjudication lifecycle** with billed, allowed, paid, member-responsibility, denial, appeal, and processing-date fields
 - **One-command pipeline** that regenerates data, rebuilds the warehouse, validates it, and refreshes outputs
@@ -51,7 +52,7 @@ The solution supports **operational and financial decision support rather than c
 | Healthcare analytics | Claims status, denials, reimbursement, readmissions, utilization, provider performance, and payment-integrity review signals |
 | SQL | CTEs, window functions, aggregation, peer benchmarking, multi-table joins, metric definitions, and data-quality checks |
 | Python | Synthetic-data generation, ETL, warehouse loading, validation, data-mart creation, and visualization automation |
-| Business intelligence | Six subject-area marts and six executive-ready dashboard previews |
+| Business intelligence | Power BI Desktop project source, semantic model, DAX KPIs, theme, six subject-area marts, and six executive-ready previews |
 | Responsible AI | Structured SQL planning, approved schema/metrics, query validation, safe execution, visible SQL, and synthetic-data disclaimers |
 | Engineering quality | Reproducible setup, modular code, tests, CI, environment-based secrets, and technical documentation |
 
@@ -95,7 +96,7 @@ flowchart LR
 |---|---|
 | ![Chronic-condition prevalence](dashboards/05_patient_chronic_conditions.png) | ![Provider payment-integrity signals](dashboards/06_fraud_risk.png) |
 
-These images are reproducible previews, not screenshots of a committed `.pbix` file. The generated CSV files in `dashboards/data_marts/` are designed to support a Power BI or Tableau layer.
+These images are reproducible previews. A source-controlled Power BI Desktop project aligned to the Snowflake model is included in [`powerbi/`](powerbi/); the generated CSV files in `dashboards/data_marts/` also remain available for lightweight BI prototyping.
 
 ## Reproducible findings
 
@@ -217,7 +218,11 @@ streamlit run streamlit_app.py
 
 Windows PowerShell users can run `Copy-Item .env.example .env` instead of `cp`.
 
-### 5. Configure the GitHub Issues bot
+### 5. Open the Power BI project
+
+After loading the Snowflake star schema, open [`powerbi/HealthcareClaimsAnalytics.pbip`](powerbi/HealthcareClaimsAnalytics.pbip) in Power BI Desktop, configure the Snowflake parameters, refresh, and apply the included theme. See the [Power BI setup guide](powerbi/README.md) and [report build specification](powerbi/report_build_spec.md).
+
+### 6. Configure the GitHub Issues bot
 
 1. Open **Repository Settings → Secrets and variables → Actions**.
 2. Add a repository secret named `OPENAI_API_KEY`.
@@ -249,6 +254,7 @@ healthcare-claims-analytics/
 ├── data/                      # Generated synthetic data and local DB (git-ignored)
 ├── docs/                      # Architecture, dictionary, walkthrough, and validation evidence
 ├── etl/                       # Data generation, warehouse loading, and mart creation
+├── powerbi/                   # PBIP source, Snowflake semantic model, DAX, theme, and report spec
 ├── scripts/                   # GitHub Issues bot
 ├── snowflake/                 # Setup, star-schema DDL, COPY INTO, and quality checks
 ├── sql/                       # Schema and five analytics domains
@@ -281,15 +287,17 @@ healthcare-claims-analytics/
 - [x] Synthetic 837/835 adjudication lifecycle and integrity labels
 - [x] SQL analytics library
 - [x] Six BI-ready marts and dashboard previews
+- [x] Power BI Desktop project source, Snowflake semantic model, DAX KPI layer, theme, and five-page report scaffold
 - [x] Streamlit AI assistant
 - [x] GitHub Issues AI bot
 - [x] SQL guardrails, automated tests, and CI
 - [x] Data dictionary and architecture documentation
+- [x] Business requirements, KPI catalog, UAT plan, Docker, and deployment guide
 
 ### Future extensions
 
 - [ ] Publish a hosted Streamlit demonstration
-- [ ] Add a native Power BI `.pbix` or Tableau workbook
+- [ ] Publish the Power BI project to a governed Fabric workspace
 - [ ] Add precision, recall, and F1 evaluation for the labeled anomaly patterns
 - [ ] Add production-grade authentication, audit logging, rate limiting, and monitoring
 
@@ -300,7 +308,7 @@ healthcare-claims-analytics/
 - Payment-integrity rules are transparent examples and may produce false positives.
 - The assistant is not a medical, coding, reimbursement, or fraud-determination system.
 - A real investigation would require policy, contract, coding, clinical, and medical-record evidence not present here.
-- Dashboard PNGs are reproducible analytical previews; a native BI workbook is a future deliverable.
+- The Power BI source is statically validated in CI; a credentialed Snowflake refresh and final visual-layout review require Power BI Desktop on Windows.
 
 ## Documentation
 
@@ -308,6 +316,11 @@ healthcare-claims-analytics/
 - [AI architecture and threat model](docs/ai_architecture.md)
 - [Data dictionary](docs/data_dictionary.md)
 - [ETL validation evidence](docs/etl_validation_log.md)
+- [Business requirements](docs/business_requirements.md)
+- [KPI catalog](docs/kpi_catalog.md)
+- [UAT test plan](docs/uat_test_plan.md)
+- [Deployment guide](docs/deployment.md)
+- [Power BI setup](powerbi/README.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
 
