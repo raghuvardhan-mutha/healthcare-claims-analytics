@@ -1,0 +1,28 @@
+name: ai-claims-question
+
+on:
+  issues:
+    types: [opened, labeled, reopened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  answer:
+    if: contains(github.event.issue.title, '[AI Question]') || contains(toJson(github.event.issue.labels.*.name), 'ai-question')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python etl/generate_data.py
+      - run: python etl/load_data.py
+      - run: python -m scripts.github_issue_bot
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.6' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

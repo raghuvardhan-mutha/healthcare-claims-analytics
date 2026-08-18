@@ -1,0 +1,23 @@
+name: Ask the claims AI
+description: Ask a question about the repository's synthetic healthcare claims data.
+title: "[AI Question] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask one analytics question. The bot returns a concise answer, a result preview, and the approved read-only SQL.
+  - type: textarea
+    id: question
+    attributes:
+      label: Analytics question
+      description: Do not include real patient data, protected health information, credentials, or confidential company information.
+      placeholder: Which provider specialties have the highest denial rates?
+    validations:
+      required: true
+  - type: checkboxes
+    id: synthetic
+    attributes:
+      label: Data acknowledgement
+      options:
+        - label: I understand this portfolio project uses synthetic data and does not provide medical or fraud determinations.
+          required: true

@@ -1,0 +1,25 @@
+{
+  "dataset_notice": "All records are synthetic. Signals indicate review candidates, not confirmed fraud.",
+  "metrics": {
+    "claim_count": "Count of claim_id across inpatient, outpatient, and carrier claims.",
+    "total_paid": "Sum of claim_payment_amount. Denied and pending claims have zero payment.",
+    "denial_rate": "Denied claims divided by all claims, multiplied by 100.",
+    "potential_unbundling": "Outpatient claims with three or more procedure lines; this is a review signal only.",
+    "potential_duplicate_group": "Two or more carrier claim IDs sharing beneficiary, provider, procedure, and service date.",
+    "readmission_signal": "An inpatient admission 0 to 30 days after the previous discharge for the same beneficiary."
+  },
+  "tables": {
+    "beneficiaries": ["beneficiary_id", "birth_date", "death_date", "sex", "race", "state", "county_code", "esrd_indicator", "part_a_coverage_months", "part_b_coverage_months", "hmo_coverage_months", "part_d_coverage_months"],
+    "chronic_conditions": ["beneficiary_id", "condition_name", "has_condition"],
+    "providers": ["provider_id", "provider_name", "specialty", "provider_type", "state", "npi_flag_suspicious"],
+    "inpatient_claims": ["claim_id", "beneficiary_id", "provider_id", "claim_start_date", "claim_end_date", "admission_date", "discharge_date", "diagnosis_related_group", "claim_payment_amount", "total_charge_amount", "deductible_amount", "claim_status"],
+    "outpatient_claims": ["claim_id", "beneficiary_id", "provider_id", "claim_start_date", "claim_end_date", "claim_payment_amount", "total_charge_amount", "deductible_amount", "claim_status"],
+    "carrier_claims": ["claim_id", "beneficiary_id", "provider_id", "claim_start_date", "claim_end_date", "claim_payment_amount", "line_processing_indicator", "claim_status"],
+    "prescription_drug_events": ["event_id", "beneficiary_id", "drug_code", "service_date", "quantity_dispensed", "days_supply", "total_drug_cost", "patient_pay_amount"],
+    "diagnosis_codes": ["diagnosis_code", "description", "category"],
+    "procedure_codes": ["procedure_code", "description", "category", "base_allowed_amount"],
+    "drug_codes": ["drug_code", "drug_name", "drug_class", "is_generic"],
+    "claim_diagnoses": ["claim_id", "claim_type", "diagnosis_code", "diagnosis_sequence"],
+    "claim_procedures": ["claim_id", "claim_type", "procedure_code", "procedure_sequence", "line_charge_amount"]
+  }
+}
