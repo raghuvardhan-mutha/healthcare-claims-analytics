@@ -1,0 +1,13 @@
+What is Data?--Data mean where we can processed and extracted in a form of text ,image and that can be processed to generate meaning full insights is called Data.
+What is data base?--A data base is an organized collection of a database stored electronically and easy to retrieve and update and manage information.
+What is Health Data?-- Healthcare is the collection of medical data and finance and insurance information generated during a patient visit.
+What is Claim?--A healthcare is a claim requested by the hospital for the insurance company for the medical bills.
+What is the difference between a Data Analyst and a Data Engineer?--Data engineer where Data engineer creates the data base ETL the flow and cleans the data and make the flow automation, where as data analyst retrieves the data from DB and organizes the data and builds the dashboards and give the business decisions.
+Why do we need a database instead of just using Excel?--Where we get millions of data every day and it can be stored in the DB easily for the retrieve and secure the large volume of data to support multiple users where as the excel cannot handle the large amount of data.
+
+Hospital--treats the patient--then claims the request--insurance company --approves/deny--store in the DB--then data analyst retrieves it.
+
+Day 2:
+Health Raw Data ---python(cleans the data)--- Postgre sql(Stores the data)---Sql(analyzes the data)--power bi(builds the dashboard)--AI(answers the business question's)
+
+POSTGRE sql: It store the millions of data 

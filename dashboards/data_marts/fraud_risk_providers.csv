@@ -1,0 +1,31 @@
+provider_id,provider_name,specialty,npi_flag_suspicious,avg_line_items_per_claim
+PRV20005,"Gardner, Robinson and Lawrence Medical Group",Nephrology,1,2.05
+PRV20008,Garcia-James Clinic,Cardiology,1,2.0
+PRV20011,Dudley Group Clinic,General Surgery,1,2.0
+PRV20002,"Mcclain, Miller and Henderson Medical Group",Family Practice,1,1.81
+PRV20009,Abbott-Munoz Medical Group,Emergency Medicine,1,1.8
+PRV20003,Davis and Sons Medical Group,Oncology,1,1.79
+PRV20006,Blake and Sons Clinic,Internal Medicine,1,1.75
+PRV20000,"Rodriguez, Figueroa and Sanchez Medical Group",Radiology,1,1.69
+PRV20001,Doyle Ltd Clinic,Cardiology,1,1.63
+PRV20010,Blair PLC Clinic,Radiology,1,1.57
+PRV20004,"Guzman, Hoffman and Baldwin Medical Group",Neurology,1,1.56
+PRV20007,"Henderson, Ramirez and Lewis Clinic",Nephrology,1,1.37
+PRV20012,Arnold Ltd Clinic,Emergency Medicine,0,1.0
+PRV20013,"Mcclure, Ward and Lee Clinic",Psychiatry,0,1.0
+PRV20014,Williams and Sons Medical Group,Psychiatry,0,1.0
+PRV20015,Galloway-Wyatt Medical Group,Emergency Medicine,0,1.0
+PRV20016,James Group Medical Group,Neurology,0,1.0
+PRV20017,"Flowers, Martin and Kelly Clinic",Nephrology,0,1.0
+PRV20018,"Adams, Zuniga and Wong Clinic",Neurology,0,1.0
+PRV20019,"Reid, Ferguson and Sanchez Medical Group",Radiology,0,1.0
+PRV20020,Gray-Mayo Clinic,Neurology,0,1.0
+PRV20021,"Watts, Robinson and Nguyen Clinic",Radiology,0,1.0
+PRV20022,Perez Inc Medical Group,Cardiology,0,1.0
+PRV20023,Morales-Jones Medical Group,Internal Medicine,0,1.0
+PRV20024,"Walter, Edwards and Rios Medical Group",Orthopedic Surgery,0,1.0
+PRV20025,Wilkerson-Day Medical Group,Nephrology,0,1.0
+PRV20026,Baker and Sons Clinic,Cardiology,0,1.0
+PRV20027,"Hoffman, Baker and Richards Medical Group",Family Practice,0,1.0
+PRV20028,"Ross, Robinson and Bright Clinic",Emergency Medicine,0,1.0
+PRV20029,"Snyder, Campos and Callahan Medical Group",Psychiatry,0,1.0
