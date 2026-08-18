@@ -15,6 +15,7 @@ detection SQL/dashboard has real signal to find.
 
 Output: CSV files in ../data/, one per table, matching sql/01_schema.sql
 """
+import argparse
 import random
 import csv
 import os
@@ -22,15 +23,16 @@ from datetime import date, timedelta
 from faker import Faker
 
 random.seed(42)
+adjudication_rng = random.Random(2_026_0818)
 fake = Faker()
 Faker.seed(42)
 
-N_BENEFICIARIES = 5000
-N_PROVIDERS = 400
-N_INPATIENT = 3000
-N_OUTPATIENT = 12000
-N_CARRIER = 25000
-N_PDE = 18000
+SCALE_PROFILES = {
+    "demo": (5_000, 400, 3_000, 12_000, 25_000, 18_000),
+    "medium": (25_000, 2_000, 20_000, 80_000, 200_000, 120_000),
+    "large": (100_000, 8_000, 75_000, 300_000, 625_000, 500_000),
+}
+N_BENEFICIARIES, N_PROVIDERS, N_INPATIENT, N_OUTPATIENT, N_CARRIER, N_PDE = SCALE_PROFILES["demo"]
 FRAUD_RATE = 0.02  # deterministic target rate within each applicable claim type
 
 OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
@@ -100,6 +102,31 @@ DRUGS = [
 ]
 
 DRG_CODES = ["039", "057", "064", "089", "127", "175", "194", "247", "292", "313", "460", "470"]
+DENIAL_CODES = ["CO-16", "CO-29", "CO-50", "CO-96", "PR-1", "PR-2"]
+
+
+def configure_scale(profile: str) -> None:
+    """Apply a documented generation profile without changing downstream code."""
+    global N_BENEFICIARIES, N_PROVIDERS, N_INPATIENT, N_OUTPATIENT, N_CARRIER, N_PDE
+    N_BENEFICIARIES, N_PROVIDERS, N_INPATIENT, N_OUTPATIENT, N_CARRIER, N_PDE = SCALE_PROFILES[profile]
+
+
+def adjudication_row(claim_id, claim_type, service_date, billed, paid, status, pattern="none"):
+    """Create a synthetic 837-to-835 adjudication lifecycle for one claim."""
+    submitted = service_date + timedelta(days=adjudication_rng.randint(1, 7))
+    received = submitted + timedelta(days=adjudication_rng.randint(0, 2))
+    adjudicated = received + timedelta(days=adjudication_rng.randint(1, 18))
+    payment_date = "" if status in ("Denied", "Pending") else (adjudicated + timedelta(days=adjudication_rng.randint(1, 7))).isoformat()
+    billed = round(max(billed, paid), 2)
+    allowed = 0.0 if status == "Denied" else round(min(billed, max(paid, billed * adjudication_rng.uniform(0.58, 0.88))), 2)
+    member_responsibility = 0.0 if status == "Denied" else round(max(allowed - paid, 0), 2)
+    denial_code = adjudication_rng.choice(DENIAL_CODES) if status == "Denied" else ""
+    return (
+        claim_id, claim_type, submitted.isoformat(), received.isoformat(), adjudicated.isoformat(),
+        payment_date, billed, allowed, paid, member_responsibility, status, denial_code,
+        "837I" if claim_type == "inpatient" else "837P", "" if status == "Pending" else "835",
+        "replacement" if status == "Appealed" else "original", status == "Appealed", pattern,
+    )
 
 
 def rand_date(start_year=2021, end_year=2023):
@@ -194,7 +221,7 @@ def generate_claims(bene_ids, provider_ids, suspicious_providers):
     diag_codes = [d[0] for d in DIAGNOSES]
     proc_codes = [(p[0], p[3]) for p in PROCEDURES]
 
-    diag_rows, proc_rows = [], []
+    diag_rows, proc_rows, adjudication_rows = [], [], []
 
     # --- Inpatient ---
     with open(f"{OUT_DIR}/inpatient_claims.csv", "w", newline="") as f:
@@ -221,6 +248,10 @@ def generate_claims(bene_ids, provider_ids, suspicious_providers):
                         admit.isoformat(), discharge.isoformat(),
                         random.choice(DRG_CODES), base_pay, charge,
                         round(random.uniform(150, 1600), 2), status])
+            adjudication_rows.append(adjudication_row(
+                cid, "inpatient", discharge, charge, base_pay, status,
+                "drg_payment_outlier" if is_fraud else "none",
+            ))
             dc = random.choice(diag_codes)
             diag_rows.append((cid, "inpatient", dc, 1))
 
@@ -243,6 +274,10 @@ def generate_claims(bene_ids, provider_ids, suspicious_providers):
                 pay = 0.0
             w.writerow([cid, bid, pid, d.isoformat(), d.isoformat(), pay, charge,
                         round(random.uniform(0, 250), 2), status])
+            adjudication_rows.append(adjudication_row(
+                cid, "outpatient", d, charge, pay, status,
+                "potential_unbundling" if is_fraud else "none",
+            ))
             diag_rows.append((cid, "outpatient", random.choice(diag_codes), 1))
 
             # normal claim: 1 procedure line. Fraud pattern: unbundling -> same
@@ -273,6 +308,10 @@ def generate_claims(bene_ids, provider_ids, suspicious_providers):
             if status in ("Denied", "Pending"):
                 pay = 0.0
             w.writerow([cid, bid, pid, d.isoformat(), d.isoformat(), pay, "A", status])
+            adjudication_rows.append(adjudication_row(
+                cid, "carrier", d, base_amt, pay, status,
+                "duplicate_billing_source" if is_duplicate else "none",
+            ))
             diag_rows.append((cid, "carrier", random.choice(diag_codes), 1))
             proc_rows.append((cid, "carrier", proc_code, 1, base_amt))
 
@@ -283,6 +322,9 @@ def generate_claims(bene_ids, provider_ids, suspicious_providers):
                 seen_dupe_keys.add(dupe_key)
                 dup_cid = f"CC{900000+i}D"
                 w.writerow([dup_cid, bid, pid, d.isoformat(), d.isoformat(), pay, "A", "Paid"])
+                adjudication_rows.append(adjudication_row(
+                    dup_cid, "carrier", d, base_amt, pay, "Paid", "duplicate_billing_copy",
+                ))
                 diag_rows.append((dup_cid, "carrier", random.choice(diag_codes), 1))
                 proc_rows.append((dup_cid, "carrier", proc_code, 1, base_amt))
 
@@ -295,6 +337,24 @@ def generate_claims(bene_ids, provider_ids, suspicious_providers):
         w = csv.writer(f)
         w.writerow(["claim_id", "claim_type", "procedure_code", "procedure_sequence", "line_charge_amount"])
         w.writerows(proc_rows)
+
+    with open(f"{OUT_DIR}/claim_adjudication.csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow([
+            "claim_id", "claim_type", "submitted_date", "received_date", "adjudicated_date",
+            "payment_date", "billed_amount", "allowed_amount", "paid_amount",
+            "member_responsibility_amount", "adjudication_status", "denial_reason_code",
+            "source_transaction", "remittance_transaction", "submission_type",
+            "appeal_indicator", "injected_pattern",
+        ])
+        w.writerows(adjudication_rows)
+
+    with open(f"{OUT_DIR}/claim_integrity_labels.csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["claim_id", "claim_type", "is_injected_signal", "injected_pattern"])
+        for row in adjudication_rows:
+            pattern = row[-1]
+            w.writerow([row[0], row[1], pattern != "none", pattern])
 
 
 # ---------------------------------------------------------------------------
@@ -318,6 +378,13 @@ def generate_pde(bene_ids):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate deterministic synthetic claims data.")
+    parser.add_argument(
+        "--scale", choices=sorted(SCALE_PROFILES), default=os.getenv("CLAIMS_SCALE", "demo"),
+        help="demo=40K, medium=300K, large=1M base claims",
+    )
+    args = parser.parse_args()
+    configure_scale(args.scale)
     print("Generating reference tables...")
     write_reference_tables()
     print("Generating beneficiaries + chronic conditions...")
@@ -328,7 +395,7 @@ if __name__ == "__main__":
     generate_claims(bene_ids, provider_ids, suspicious_providers)
     print("Generating prescription drug events...")
     generate_pde(bene_ids)
-    print(f"\nDone. {N_BENEFICIARIES} beneficiaries, {N_PROVIDERS} providers "
+    print(f"\nDone ({args.scale} profile). {N_BENEFICIARIES} beneficiaries, {N_PROVIDERS} providers "
           f"({len(suspicious_providers)} seeded as fraud-pattern outliers), "
           f"{N_INPATIENT + N_OUTPATIENT + N_CARRIER} total claims, {N_PDE} drug events.")
     print(f"CSV files written to: {OUT_DIR}")

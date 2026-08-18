@@ -16,6 +16,38 @@ All records are synthetic. The model is inspired by common Medicare claims conce
 | `drug_codes` | One row per drug code | `drug_code` | NDC-style drug reference, class, and generic indicator |
 | `claim_diagnoses` | One row per claim diagnosis sequence | `claim_id`, `claim_type`, `diagnosis_sequence` | Many-to-many bridge from claims to diagnoses |
 | `claim_procedures` | One row per claim procedure sequence | `claim_id`, `claim_type`, `procedure_sequence` | Many-to-many bridge from claims to procedures and line charges |
+| `claim_adjudication` | One row per claim | `claim_id`, `claim_type` | Synthetic 837-to-835 submission, adjudication, payment, denial, and appeal lifecycle |
+| `claim_integrity_labels` | One row per claim | `claim_id`, `claim_type` | Ground-truth label for deliberately injected synthetic review signals |
+
+## Adjudication fields
+
+| Column | Description |
+|---|---|
+| `submitted_date` | Synthetic date the claim was submitted |
+| `received_date` | Synthetic payer receipt date |
+| `adjudicated_date` | Synthetic adjudication completion date |
+| `payment_date` | Payment date when applicable |
+| `billed_amount` | Provider-billed amount |
+| `allowed_amount` | Synthetic allowed amount after adjudication |
+| `paid_amount` | Synthetic payer-paid amount |
+| `member_responsibility_amount` | Difference assigned to member responsibility |
+| `adjudication_status` | Paid, Denied, Pending, or Appealed |
+| `denial_reason_code` | Synthetic CARC-style reason code for denied claims |
+| `source_transaction` | Synthetic `837I` or `837P` source indicator |
+| `remittance_transaction` | Synthetic `835` indicator when adjudicated |
+| `submission_type` | Original or replacement submission |
+| `appeal_indicator` | Whether the claim follows the synthetic appeal path |
+
+## Dimensional analytics layer
+
+| Table | Grain |
+|---|---|
+| `dim_date` | One row per claim service date |
+| `dim_member` | One row per synthetic beneficiary |
+| `dim_provider` | One row per synthetic provider |
+| `fact_claim` | One row per claim across inpatient, outpatient, and carrier sources |
+| `bridge_claim_diagnosis` | One row per claim-diagnosis sequence |
+| `fact_claim_procedure` | One row per claim-procedure sequence |
 
 ## Core metric definitions
 

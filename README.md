@@ -5,6 +5,7 @@
 [![Analytics Pipeline](https://github.com/raghuvardhan-mutha/healthcare-claims-analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/raghuvardhan-mutha/healthcare-claims-analytics/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![SQLite](https://img.shields.io/badge/Warehouse-SQLite-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Snowflake](https://img.shields.io/badge/Enterprise-Snowflake-29B5E8?logo=snowflake&logoColor=white)](snowflake/README.md)
 [![OpenAI](https://img.shields.io/badge/AI-OpenAI%20Responses%20API-412991?logo=openai&logoColor=white)](https://platform.openai.com/docs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -35,6 +36,9 @@ The solution supports **operational and financial decision support rather than c
 - **12-table normalized data model** with diagnosis and procedure bridge tables
 - **30+ SQL analyses** across claims operations, finance, providers, population health, and payment integrity
 - **Six reproducible BI-ready marts** and matching dashboard previews
+- **Working dimensional star schema** with Snowflake deployment and quality-check SQL
+- **Configurable scale profiles** for approximately 40K, 300K, or 1M base claims
+- **Synthetic 837/835 adjudication lifecycle** with billed, allowed, paid, member-responsibility, denial, appeal, and processing-date fields
 - **One-command pipeline** that regenerates data, rebuilds the warehouse, validates it, and refreshes outputs
 - **AI analytics assistant** available through Streamlit and GitHub Issues
 - **Defense-in-depth query security** using a semantic allowlist, SQL AST validation, read-only SQLite, a five-second timeout, and a 200-row limit
@@ -56,9 +60,11 @@ The solution supports **operational and financial decision support rather than c
 ```mermaid
 flowchart LR
     A["Synthetic source files"] --> B["Python ETL and validation"]
-    B --> C[("SQLite analytics warehouse")]
+    B --> C[("SQLite normalized warehouse")]
+    C --> S["Dimensional star schema"]
+    S --> W[("Snowflake")]
     C --> D["SQL analysis library"]
-    C --> E["BI-ready data marts"]
+    S --> E["BI-ready data marts"]
     E --> F["Dashboard previews"]
     G["Streamlit or GitHub Issue"] --> H["Guarded AI assistant"]
     H --> C
@@ -68,10 +74,12 @@ flowchart LR
 
 1. `etl/generate_data.py` creates deterministic synthetic claims-style CSV files.
 2. `etl/load_data.py` builds the SQLite warehouse and runs source-to-target validation.
-3. `etl/build_data_marts.py` materializes six analysis-ready CSV marts.
-4. `visualizations/generate_dashboard_previews.py` renders reproducible portfolio visuals.
-5. `ai/assistant.py` translates approved questions into guarded, read-only SQLite queries.
-6. GitHub Actions rebuilds the pipeline and runs all tests on every push and pull request.
+3. `etl/build_star_schema.py` creates a Power BI- and Snowflake-aligned dimensional layer.
+4. `etl/export_star_schema.py` writes validated Snowflake-ready files.
+5. `etl/build_data_marts.py` materializes six analysis-ready CSV marts.
+6. `visualizations/generate_dashboard_previews.py` renders reproducible portfolio visuals.
+7. `ai/assistant.py` translates approved questions into guarded, read-only SQLite queries.
+8. GitHub Actions rebuilds the pipeline and runs all tests on every push and pull request.
 
 ## Dashboard gallery
 
@@ -184,6 +192,15 @@ python run_pipeline.py
 
 The pipeline regenerates the synthetic data, rebuilds the warehouse, executes validation, refreshes six marts, and recreates six dashboard previews.
 
+Choose a larger portfolio benchmark when needed:
+
+```bash
+python etl/generate_data.py --scale medium  # approximately 300K base claims
+python etl/generate_data.py --scale large   # 1M base claims
+```
+
+Then run `python etl/load_data.py`, `python etl/build_star_schema.py`, and `python etl/export_star_schema.py`. The default `demo` profile remains fast enough for CI.
+
 ### 3. Run the tests
 
 ```bash
@@ -233,6 +250,7 @@ healthcare-claims-analytics/
 ├── docs/                      # Architecture, dictionary, walkthrough, and validation evidence
 ├── etl/                       # Data generation, warehouse loading, and mart creation
 ├── scripts/                   # GitHub Issues bot
+├── snowflake/                 # Setup, star-schema DDL, COPY INTO, and quality checks
 ├── sql/                       # Schema and five analytics domains
 ├── tests/                     # Pipeline, AI assistant, and guardrail tests
 ├── visualizations/            # Reproducible chart generation
@@ -245,6 +263,8 @@ healthcare-claims-analytics/
 
 - The data generator uses a fixed seed for repeatable results.
 - Validation covers record counts, required fields, key relationships, and business-rule checks.
+- Adjudication checks enforce date chronology and `paid ≤ allowed ≤ billed` reconciliation.
+- Ground-truth synthetic labels identify deliberately injected review signals for later evaluation.
 - Tests cover the pipeline, AI behavior, and SQL guardrails.
 - CI runs a clean warehouse rebuild and the test suite on pushes and pull requests.
 - Secrets are loaded only from local environment variables or GitHub Actions secrets.
@@ -256,6 +276,9 @@ healthcare-claims-analytics/
 
 - [x] Reproducible synthetic claims pipeline
 - [x] Normalized SQLite warehouse
+- [x] Dimensional star schema and Snowflake deployment scripts
+- [x] Configurable 40K/300K/1M generation profiles
+- [x] Synthetic 837/835 adjudication lifecycle and integrity labels
 - [x] SQL analytics library
 - [x] Six BI-ready marts and dashboard previews
 - [x] Streamlit AI assistant
@@ -267,13 +290,13 @@ healthcare-claims-analytics/
 
 - [ ] Publish a hosted Streamlit demonstration
 - [ ] Add a native Power BI `.pbix` or Tableau workbook
-- [ ] Add labeled anomaly patterns and model evaluation metrics
+- [ ] Add precision, recall, and F1 evaluation for the labeled anomaly patterns
 - [ ] Add production-grade authentication, audit logging, rate limiting, and monitoring
 
 ## Limitations
 
 - This is synthetic portfolio data, not CMS source data and not production healthcare data.
-- SQLite is the supported local query dialect; several date expressions require changes for PostgreSQL.
+- SQLite is the supported zero-configuration local dialect; the `snowflake/` folder provides a separate enterprise deployment path.
 - Payment-integrity rules are transparent examples and may produce false positives.
 - The assistant is not a medical, coding, reimbursement, or fraud-determination system.
 - A real investigation would require policy, contract, coding, clinical, and medical-record evidence not present here.

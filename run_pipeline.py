@@ -11,6 +11,8 @@ ROOT = Path(__file__).resolve().parent
 STEPS = [
     ("Generate deterministic synthetic claims", ROOT / "etl" / "generate_data.py"),
     ("Load and validate the SQLite warehouse", ROOT / "etl" / "load_data.py"),
+    ("Build the dimensional star schema", ROOT / "etl" / "build_star_schema.py"),
+    ("Export Snowflake-ready dimensional files", ROOT / "etl" / "export_star_schema.py"),
     ("Build dashboard-ready data marts", ROOT / "etl" / "build_data_marts.py"),
     ("Render dashboard previews", ROOT / "visualizations" / "generate_dashboard_previews.py"),
 ]

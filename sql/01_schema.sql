@@ -7,6 +7,8 @@
 
 DROP TABLE IF EXISTS claim_procedures;
 DROP TABLE IF EXISTS claim_diagnoses;
+DROP TABLE IF EXISTS claim_integrity_labels;
+DROP TABLE IF EXISTS claim_adjudication;
 DROP TABLE IF EXISTS prescription_drug_events;
 DROP TABLE IF EXISTS carrier_claims;
 DROP TABLE IF EXISTS outpatient_claims;
@@ -147,6 +149,37 @@ CREATE TABLE claim_procedures (
     PRIMARY KEY (claim_id, claim_type, procedure_sequence)
 );
 
+-- 13. Synthetic claim submission and adjudication lifecycle (837 -> 835)
+CREATE TABLE claim_adjudication (
+    claim_id                        VARCHAR(20),
+    claim_type                      VARCHAR(20),
+    submitted_date                  DATE NOT NULL,
+    received_date                   DATE NOT NULL,
+    adjudicated_date                DATE NOT NULL,
+    payment_date                    DATE,
+    billed_amount                   NUMERIC(12,2) NOT NULL,
+    allowed_amount                  NUMERIC(12,2) NOT NULL,
+    paid_amount                     NUMERIC(12,2) NOT NULL,
+    member_responsibility_amount    NUMERIC(12,2) NOT NULL,
+    adjudication_status             VARCHAR(20) NOT NULL,
+    denial_reason_code              VARCHAR(10),
+    source_transaction              VARCHAR(10) NOT NULL,
+    remittance_transaction          VARCHAR(10),
+    submission_type                 VARCHAR(20) NOT NULL,
+    appeal_indicator                BOOLEAN DEFAULT FALSE,
+    injected_pattern                VARCHAR(40) NOT NULL,
+    PRIMARY KEY (claim_id, claim_type)
+);
+
+-- 14. Ground-truth labels for evaluating synthetic payment-integrity rules
+CREATE TABLE claim_integrity_labels (
+    claim_id             VARCHAR(20),
+    claim_type           VARCHAR(20),
+    is_injected_signal   BOOLEAN NOT NULL,
+    injected_pattern     VARCHAR(40) NOT NULL,
+    PRIMARY KEY (claim_id, claim_type)
+);
+
 -- Indexes for common analytical joins
 CREATE INDEX idx_inpatient_bene ON inpatient_claims(beneficiary_id);
 CREATE INDEX idx_inpatient_provider ON inpatient_claims(provider_id);
@@ -157,3 +190,5 @@ CREATE INDEX idx_carrier_provider ON carrier_claims(provider_id);
 CREATE INDEX idx_pde_bene ON prescription_drug_events(beneficiary_id);
 CREATE INDEX idx_claimdiag_claim ON claim_diagnoses(claim_id, claim_type);
 CREATE INDEX idx_claimproc_claim ON claim_procedures(claim_id, claim_type);
+CREATE INDEX idx_adjudication_status ON claim_adjudication(adjudication_status);
+CREATE INDEX idx_integrity_pattern ON claim_integrity_labels(injected_pattern);
