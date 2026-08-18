@@ -151,8 +151,4 @@ Power BI-ready data marts · Git
 
 ## About this project
 
-Built by Raghu Vardhan Mutha, Data Analyst — Claims & Payment Integrity at
-United Health Group. This project reflects the same problem space I work in
-day to day (claims lifecycle analytics, denial/appeal trends, provider
-performance, payment-integrity investigation), rebuilt end-to-end on
-synthetic data for a public portfolio.
+Built by Raghu Vardhan Mutha, Data Analyst — Claims & Payment Integrity .
