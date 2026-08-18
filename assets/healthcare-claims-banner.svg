@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="360" viewBox="0 0 1400 360" role="img" aria-labelledby="title desc">
+  <title id="title">Healthcare Claims and Payment Integrity Analytics Platform</title>
+  <desc id="desc">A professional teal and navy banner showing claims data flowing through analytics into trusted decisions.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#081a33"/>
+      <stop offset="0.58" stop-color="#0d5361"/>
+      <stop offset="1" stop-color="#12a1a1"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#061426" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <rect width="1400" height="360" rx="28" fill="url(#bg)"/>
+  <circle cx="1280" cy="52" r="150" fill="#ffffff" opacity="0.05"/>
+  <circle cx="1190" cy="330" r="210" fill="#ffffff" opacity="0.04"/>
+  <g transform="translate(74 68)">
+    <rect width="94" height="94" rx="24" fill="#ffffff" opacity="0.14"/>
+    <path d="M47 18v58M18 47h58" stroke="#ffffff" stroke-width="13" stroke-linecap="round"/>
+  </g>
+  <text x="74" y="205" fill="#9ee9e8" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="3">END-TO-END ANALYTICS PORTFOLIO</text>
+  <text x="74" y="255" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">Healthcare Claims &amp; Payment Integrity</text>
+  <text x="74" y="305" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">Analytics Platform</text>
+  <g transform="translate(930 82)" filter="url(#shadow)" font-family="Arial, Helvetica, sans-serif">
+    <rect width="390" height="198" rx="24" fill="#ffffff" opacity="0.96"/>
+    <g transform="translate(28 30)">
+      <rect width="96" height="42" rx="10" fill="#e7f7f7"/>
+      <text x="48" y="27" text-anchor="middle" fill="#0d5361" font-size="14" font-weight="700">CLAIMS</text>
+      <path d="M106 21h38" stroke="#6d8a91" stroke-width="3" stroke-linecap="round"/>
+      <path d="M137 14l9 7-9 7" fill="none" stroke="#6d8a91" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="154" width="86" height="42" rx="10" fill="#eaf0f8"/>
+      <text x="197" y="27" text-anchor="middle" fill="#16355c" font-size="14" font-weight="700">SQL + AI</text>
+      <path d="M250 21h38" stroke="#6d8a91" stroke-width="3" stroke-linecap="round"/>
+      <path d="M281 14l9 7-9 7" fill="none" stroke="#6d8a91" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="298" width="64" height="42" rx="10" fill="#0f777f"/>
+      <text x="330" y="27" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">BI</text>
+      <text x="0" y="98" fill="#253b4a" font-size="15" font-weight="700">Validated • Reproducible • Explainable</text>
+      <g transform="translate(0 122)">
+        <rect width="102" height="30" rx="15" fill="#f0f4f8"/>
+        <text x="51" y="20" text-anchor="middle" fill="#415b6b" font-size="12" font-weight="700">40K+ CLAIMS</text>
+        <rect x="112" width="104" height="30" rx="15" fill="#f0f4f8"/>
+        <text x="164" y="20" text-anchor="middle" fill="#415b6b" font-size="12" font-weight="700">30+ ANALYSES</text>
+        <rect x="226" width="136" height="30" rx="15" fill="#e7f7f7"/>
+        <text x="294" y="20" text-anchor="middle" fill="#0d5361" font-size="12" font-weight="700">GUARDED AI</text>
+      </g>
+    </g>
+  </g>
+</svg>

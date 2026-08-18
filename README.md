@@ -1,102 +1,217 @@
-# Healthcare Claims & Payment Integrity Analytics
+# Healthcare Claims & Payment Integrity Analytics Platform
+
+![Healthcare Claims Analytics Platform](assets/healthcare-claims-banner.svg)
 
 [![Analytics Pipeline](https://github.com/raghuvardhan-mutha/healthcare-claims-analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/raghuvardhan-mutha/healthcare-claims-analytics/actions/workflows/ci.yml)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![SQLite](https://img.shields.io/badge/Warehouse-SQLite-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![OpenAI](https://img.shields.io/badge/AI-OpenAI%20Responses%20API-412991?logo=openai&logoColor=white)](https://platform.openai.com/docs/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-An end-to-end healthcare analytics portfolio project that turns deterministic synthetic Medicare-style claims into a normalized SQLite warehouse, validated SQL analyses, dashboard data marts, reproducible visual outputs, and a guarded AI analytics assistant.
+An end-to-end healthcare analytics portfolio project that converts deterministic synthetic Medicare-style claims into a normalized analytics warehouse, validated SQL insights, BI-ready data marts, reproducible dashboard previews, and a guarded natural-language analytics assistant.
 
-> **Important:** All patients, providers, claims, and results are synthetic. Payment-integrity signals identify records for review; they do not prove fraud.
+> **Portfolio and educational use only.** Every patient, provider, claim, and result is synthetic. Payment-integrity indicators are review signals—not findings of fraud, clinical conclusions, or reimbursement determinations.
 
-## Project highlights
+[View dashboards](#dashboard-gallery) · [Run the project](#quick-start) · [Try the AI assistant](#ai-claims-assistant) · [Review the data model](docs/data_dictionary.md) · [Read the project walkthrough](docs/project_walkthrough.md)
 
-- **40,514 claims** across inpatient, outpatient, and professional/carrier services
-- **12-table normalized model** with claim-to-diagnosis and claim-to-procedure bridges
-- **30+ SQL analyses** covering claims operations, finance, providers, population health, and payment integrity
-- Explainable risk signals for duplicate billing, potential unbundling, and DRG payment outliers
-- Automated source-to-target and data-quality validation
-- Six reproducible dashboard-ready marts and portfolio previews
-- One-command pipeline with automated tests and GitHub Actions
-- OpenAI-powered natural-language analytics with structured SQL planning
-- Two AI interfaces: an interactive Streamlit app and a GitHub Issues bot
-- Defense-in-depth SQL safety: semantic allowlist, AST validation, read-only database, query timeout, and row limit
+## Executive summary
 
-## Ask the claims AI
+Healthcare claims teams need consistent ways to monitor claim volume, denials, reimbursement, provider performance, utilization, and possible payment-integrity issues. This project demonstrates how an analyst can turn raw claims-style files into decision-ready outputs while preserving reproducibility, data quality, explainability, and responsible AI controls.
 
-The project now includes an AI analytics assistant that turns plain-English questions into approved SQLite queries, executes them against the synthetic warehouse, and returns an explanation, result table, chart, and the SQL used.
+The solution supports **operational and financial decision support rather than clinical decision-making**.
 
-Try questions such as:
+| Business need | Project capability | Decision supported |
+|---|---|---|
+| Fragmented claims data | Python ETL and a normalized 12-table warehouse | Create a consistent analytical foundation |
+| Slow recurring analysis | 30+ reusable SQL analyses and six data marts | Monitor KPIs without rebuilding queries |
+| Denial and reimbursement visibility | Claims, financial, provider, and population-health views | Prioritize root-cause investigation |
+| Payment-integrity review | Explainable duplicate, unbundling, and peer-outlier signals | Build focused review queues |
+| Self-service questions | Guarded natural-language-to-SQL assistant | Shorten the path from question to evidence |
+| Trust and reproducibility | Fixed seed, validation checks, automated tests, and CI | Recreate and verify every published result |
 
-- Which specialties have the highest denial rates?
-- Which providers have the strongest payment-integrity signals?
-- Show the monthly paid-amount trend.
-- Which chronic conditions are most common?
+## Portfolio highlights
 
-The built-in questions work without an API key. Free-form questions use the OpenAI Responses API and Structured Outputs when `OPENAI_API_KEY` is configured.
+- **40,514 synthetic claims** across inpatient, outpatient, and professional/carrier services
+- **12-table normalized data model** with diagnosis and procedure bridge tables
+- **30+ SQL analyses** across claims operations, finance, providers, population health, and payment integrity
+- **Six reproducible BI-ready marts** and matching dashboard previews
+- **One-command pipeline** that regenerates data, rebuilds the warehouse, validates it, and refreshes outputs
+- **AI analytics assistant** available through Streamlit and GitHub Issues
+- **Defense-in-depth query security** using a semantic allowlist, SQL AST validation, read-only SQLite, a five-second timeout, and a 200-row limit
+- **Automated quality gates** with pytest and GitHub Actions
 
-### Interactive web app
+## Skills demonstrated
 
-```bash
-cp .env.example .env
-# Add OPENAI_API_KEY to .env when you are ready to enable free-form questions.
-streamlit run streamlit_app.py
+| Area | Evidence in this repository |
+|---|---|
+| Healthcare analytics | Claims status, denials, reimbursement, readmissions, utilization, provider performance, and payment-integrity review signals |
+| SQL | CTEs, window functions, aggregation, peer benchmarking, multi-table joins, metric definitions, and data-quality checks |
+| Python | Synthetic-data generation, ETL, warehouse loading, validation, data-mart creation, and visualization automation |
+| Business intelligence | Six subject-area marts and six executive-ready dashboard previews |
+| Responsible AI | Structured SQL planning, approved schema/metrics, query validation, safe execution, visible SQL, and synthetic-data disclaimers |
+| Engineering quality | Reproducible setup, modular code, tests, CI, environment-based secrets, and technical documentation |
+
+## Solution architecture
+
+```mermaid
+flowchart LR
+    A["Synthetic source files"] --> B["Python ETL and validation"]
+    B --> C[("SQLite analytics warehouse")]
+    C --> D["SQL analysis library"]
+    C --> E["BI-ready data marts"]
+    E --> F["Dashboard previews"]
+    G["Streamlit or GitHub Issue"] --> H["Guarded AI assistant"]
+    H --> C
 ```
 
-### GitHub Issues bot
+### Processing flow
 
-Open an issue with the **Ask the claims AI** template. After the repository owner adds an `OPENAI_API_KEY` Actions secret, the workflow posts a concise answer, result preview, and approved SQL directly to the issue.
+1. `etl/generate_data.py` creates deterministic synthetic claims-style CSV files.
+2. `etl/load_data.py` builds the SQLite warehouse and runs source-to-target validation.
+3. `etl/build_data_marts.py` materializes six analysis-ready CSV marts.
+4. `visualizations/generate_dashboard_previews.py` renders reproducible portfolio visuals.
+5. `ai/assistant.py` translates approved questions into guarded, read-only SQLite queries.
+6. GitHub Actions rebuilds the pipeline and runs all tests on every push and pull request.
 
-Repository setup:
-
-1. Go to **Settings → Secrets and variables → Actions**.
-2. Create the repository secret `OPENAI_API_KEY`.
-3. Optionally create the repository variable `OPENAI_MODEL`; the default is `gpt-5.6`.
-4. Open an issue whose title begins with `[AI Question]`.
-
-Never paste real patient data, PHI, credentials, or confidential company information into the app or an issue. See the [AI architecture and threat model](docs/ai_architecture.md).
-
-## Dashboard preview
+## Dashboard gallery
 
 | Executive overview | Claims status |
 |---|---|
 | ![Monthly claim payments](dashboards/01_executive_summary.png) | ![Claims status distribution](dashboards/02_claims_status.png) |
 
-| Provider performance | Payment integrity |
+| Financial performance | Provider performance |
 |---|---|
-| ![Provider performance](dashboards/04_provider_performance.png) | ![Provider payment-integrity risk](dashboards/06_fraud_risk.png) |
+| ![Financial performance by specialty](dashboards/03_financial_by_specialty.png) | ![Provider performance](dashboards/04_provider_performance.png) |
 
-Additional views: [financial performance](dashboards/03_financial_by_specialty.png) and [population health](dashboards/05_patient_chronic_conditions.png).
+| Population health | Payment-integrity review |
+|---|---|
+| ![Chronic-condition prevalence](dashboards/05_patient_chronic_conditions.png) | ![Provider payment-integrity signals](dashboards/06_fraud_risk.png) |
 
-## Reproducible sample findings
+These images are reproducible previews, not screenshots of a committed `.pbix` file. The generated CSV files in `dashboards/data_marts/` are designed to support a Power BI or Tableau layer.
 
-The seeded dataset produces the following results when run with the fixed random seed:
+## Reproducible findings
+
+The fixed random seed produces the same portfolio results on every clean run.
 
 | Metric | Result | Operational interpretation |
 |---|---:|---|
 | Total claims | 40,514 | Combined inpatient, outpatient, and carrier volume |
 | Total paid amount | $118.5M | Synthetic paid amount across three service years |
-| Denial rate | 7.7% | Starting point for denial root-cause analysis |
+| Denial rate | 7.7% | Baseline for denial root-cause investigation |
 | Potential unbundled claims | 237 | Outpatient claims with three or more procedure lines |
 | Potential duplicate groups | 514 | Same beneficiary, provider, procedure, and service date across multiple claim IDs |
-| 30-day readmission signals | 47 | Admissions occurring 0–30 days after a prior discharge |
+| 30-day readmission signals | 47 | Admissions 0–30 days after a prior discharge |
 
-These indicators would support investigation queues, provider education, prepayment edits, and focused denial-reduction work. They require clinical and coding review before action.
+Potential operational actions include focused denial review, provider education, prepayment-edit design, reimbursement monitoring, and prioritized investigation queues. Real-world action would require coding, clinical, contract, policy, and medical-record review.
 
-## Architecture
+## Analytics domains
 
-```mermaid
-flowchart TD
-    A[Deterministic synthetic CSVs] --> B[Python ETL]
-    B --> C[(SQLite analytics warehouse)]
-    C --> D[Validated SQL analyses]
-    C --> E[Dashboard data marts]
-    E --> F[Portfolio previews / Power BI]
-    B --> G[Data-quality log]
-    H[Streamlit or GitHub Issue] --> I[Guarded AI assistant]
-    I --> C
+| Domain | Business questions | Source |
+|---|---|---|
+| Claims operations | What is the volume, status mix, denial rate, service duration, aging, and appeal pattern? | [02_claims_analytics.sql](sql/02_claims_analytics.sql) |
+| Financial analytics | How are paid amounts trending? Which members, drugs, and specialties drive cost? | [03_financial_analytics.sql](sql/03_financial_analytics.sql) |
+| Provider analytics | How do providers compare with specialty peers on denial, utilization, and reimbursement? | [04_provider_analytics.sql](sql/04_provider_analytics.sql) |
+| Population health | What conditions, comorbidities, geographic patterns, and readmission signals appear? | [05_patient_analytics.sql](sql/05_patient_analytics.sql) |
+| Payment integrity | Where are potential duplicate, unbundling, DRG, and peer-cost signals concentrated? | [06_fraud_detection.sql](sql/06_fraud_detection.sql) |
+
+The provider risk score combines potential unbundling, potential duplicate groups, and cost variance versus specialty peers. It is an explainable prioritization rule, not a fraud model.
+
+## AI claims assistant
+
+The assistant converts a plain-English analytics question into an approved SQLite query, executes it against the synthetic warehouse, and returns a concise explanation, table, chart when appropriate, and the exact SQL used.
+
+Example questions:
+
+- Which specialties have the highest denial rates?
+- Which providers have the strongest payment-integrity review signals?
+- Show the monthly paid-amount trend.
+- Which chronic conditions are most common?
+
+### Two ways to use it
+
+| Interface | Best for | API key requirement |
+|---|---|---|
+| Streamlit app | Interactive portfolio demonstrations | Built-in questions work without a key; free-form questions require one |
+| GitHub Issues bot | Auditable question-and-answer workflow | Requires `OPENAI_API_KEY` in GitHub Actions secrets |
+
+### AI safety controls
+
+- Only one `SELECT` statement is allowed.
+- Tables and columns must exist in the approved semantic layer.
+- SQLGlot parses and validates the query before execution.
+- SQLite opens in read-only, query-only mode.
+- Queries time out after five seconds and return no more than 200 rows.
+- Generated SQL is visible to the user.
+- OpenAI requests set `store=False`.
+- No API key is stored in source control.
+- All responses are constrained to synthetic analytical evidence.
+
+See [AI architecture and threat model](docs/ai_architecture.md) for implementation details.
+
+## Quick start
+
+### Prerequisites
+
+- Python 3.11 or newer
+- Git
+- Optional: an OpenAI API key for free-form AI questions
+
+### 1. Clone and create an environment
+
+```bash
+git clone https://github.com/raghuvardhan-mutha/healthcare-claims-analytics.git
+cd healthcare-claims-analytics
+python -m venv .venv
 ```
+
+Activate it:
+
+```bash
+# macOS/Linux
+source .venv/bin/activate
+
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+```
+
+### 2. Install dependencies and build everything
+
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python run_pipeline.py
+```
+
+The pipeline regenerates the synthetic data, rebuilds the warehouse, executes validation, refreshes six marts, and recreates six dashboard previews.
+
+### 3. Run the tests
+
+```bash
+python -m pytest -q
+```
+
+### 4. Launch the web app
+
+```bash
+cp .env.example .env
+# Add OPENAI_API_KEY only if you want free-form questions.
+streamlit run streamlit_app.py
+```
+
+Windows PowerShell users can run `Copy-Item .env.example .env` instead of `cp`.
+
+### 5. Configure the GitHub Issues bot
+
+1. Open **Repository Settings → Secrets and variables → Actions**.
+2. Add a repository secret named `OPENAI_API_KEY`.
+3. Optionally add a repository variable named `OPENAI_MODEL`; the default is `gpt-5.6`.
+4. Open **Issues → New issue → Ask the claims AI**.
+
+The OpenAI API is billed separately from ChatGPT subscriptions. Never paste API keys, PHI, real patient data, or confidential company information into code, issues, logs, or screenshots.
 
 ## Data model
 
-The model is inspired by Medicare claims concepts while remaining intentionally smaller than official CMS datasets.
+The intentionally compact model is inspired by Medicare claims concepts:
 
 - Members: `beneficiaries`, `chronic_conditions`
 - Providers: `providers`
@@ -105,89 +220,78 @@ The model is inspired by Medicare claims concepts while remaining intentionally 
 - Code dimensions: `diagnosis_codes`, `procedure_codes`, `drug_codes`
 - Bridges: `claim_diagnoses`, `claim_procedures`
 
-See the [data dictionary](docs/data_dictionary.md) and [schema DDL](sql/01_schema.sql).
-
-## Analytics domains
-
-| SQL file | Business questions |
-|---|---|
-| [Claims operations](sql/02_claims_analytics.sql) | Volume, status mix, denial rates, service duration, aging, and appeals |
-| [Financial analytics](sql/03_financial_analytics.sql) | Paid trends, charge-to-paid ratio, high-cost members, and drug spending |
-| [Provider analytics](sql/04_provider_analytics.sql) | Peer benchmarks, denial performance, utilization, and cost outliers |
-| [Population health](sql/05_patient_analytics.sql) | Prevalence, comorbidity, utilization, geography, and readmission signals |
-| [Payment integrity](sql/06_fraud_detection.sql) | Potential unbundling, duplicate billing, DRG outliers, and provider risk ranking |
-
-The composite provider score includes all three documented components: unbundled-claim count, duplicate groups, and cost variance versus specialty peers.
-
-## Run locally
-
-Requires Python 3.11 or newer.
-
-```bash
-git clone https://github.com/raghuvardhan-mutha/healthcare-claims-analytics.git
-cd healthcare-claims-analytics
-python -m venv .venv
-
-# macOS/Linux
-source .venv/bin/activate
-
-# Windows PowerShell
-# .venv\Scripts\Activate.ps1
-
-pip install -r requirements.txt
-python run_pipeline.py
-python -m pytest -q
-streamlit run streamlit_app.py
-```
-
-The pipeline regenerates the synthetic CSVs, rebuilds the warehouse, runs validation, refreshes all six marts, and recreates the preview images.
+See the complete [data dictionary](docs/data_dictionary.md) and [schema DDL](sql/01_schema.sql).
 
 ## Repository structure
 
 ```text
 healthcare-claims-analytics/
-├── ai/
-│   ├── assistant.py              # OpenAI planning and result explanation
-│   ├── database.py               # read-only SQLite execution
-│   ├── semantic_layer.json       # approved tables, columns, and metrics
-│   └── sql_guard.py              # SQL AST validation and row cap
-├── .github/workflows/ci.yml
-├── .github/workflows/ai-issue-bot.yml
-├── data/                         # generated synthetic CSVs and local DB (git-ignored)
-├── dashboards/
-│   ├── data_marts/               # reproducible BI-ready outputs
-│   └── *.png                     # reproducible portfolio previews
-├── docs/
-│   ├── data_dictionary.md
-│   ├── ai_architecture.md
-│   └── etl_validation_log.md
-├── etl/
-│   ├── generate_data.py
-│   ├── load_data.py
-│   └── build_data_marts.py
-├── sql/                          # schema plus five analytics domains
-├── tests/test_pipeline.py
-├── tests/test_sql_guard.py
-├── scripts/github_issue_bot.py
-├── streamlit_app.py
-├── visualizations/generate_dashboard_previews.py
-├── requirements.txt
-└── run_pipeline.py
+├── ai/                         # Assistant, semantic layer, database access, and SQL guard
+├── assets/                     # README visual assets
+├── dashboards/                # Six previews and generated BI-ready marts
+├── data/                      # Generated synthetic data and local DB (git-ignored)
+├── docs/                      # Architecture, dictionary, walkthrough, and validation evidence
+├── etl/                       # Data generation, warehouse loading, and mart creation
+├── scripts/                   # GitHub Issues bot
+├── sql/                       # Schema and five analytics domains
+├── tests/                     # Pipeline, AI assistant, and guardrail tests
+├── visualizations/            # Reproducible chart generation
+├── streamlit_app.py           # Interactive AI analytics UI
+├── run_pipeline.py            # One-command project build
+└── requirements.txt           # Reproducible Python dependencies
 ```
 
-## Design decisions and limitations
+## Quality and governance
 
-- Synthetic data uses a fixed seed so results are reproducible.
-- The local demo uses SQLite. Some analytics queries use SQLite date functions such as `strftime` and `julianday`; PostgreSQL would require dialect-specific date replacements.
-- The warehouse loader translates PostgreSQL-oriented `NUMERIC` and `BOOLEAN` types for SQLite.
-- Risk rules are transparent portfolio examples, not production fraud models.
-- The AI assistant is an analytical interface, not a medical, coding, reimbursement, or fraud-determination system.
-- Clinical appropriateness, coding policy, contracts, and medical records are outside this dataset and would be required for a real payment-integrity determination.
-- Static images demonstrate the analytical story. A `.pbix` or Tableau workbook can be layered onto the generated marts as a separate BI deliverable.
+- The data generator uses a fixed seed for repeatable results.
+- Validation covers record counts, required fields, key relationships, and business-rule checks.
+- Tests cover the pipeline, AI behavior, and SQL guardrails.
+- CI runs a clean warehouse rebuild and the test suite on pushes and pull requests.
+- Secrets are loaded only from local environment variables or GitHub Actions secrets.
+- Real PHI is outside the scope of this repository.
+
+## Current scope and roadmap
+
+### Complete
+
+- [x] Reproducible synthetic claims pipeline
+- [x] Normalized SQLite warehouse
+- [x] SQL analytics library
+- [x] Six BI-ready marts and dashboard previews
+- [x] Streamlit AI assistant
+- [x] GitHub Issues AI bot
+- [x] SQL guardrails, automated tests, and CI
+- [x] Data dictionary and architecture documentation
+
+### Future extensions
+
+- [ ] Publish a hosted Streamlit demonstration
+- [ ] Add a native Power BI `.pbix` or Tableau workbook
+- [ ] Add labeled anomaly patterns and model evaluation metrics
+- [ ] Add production-grade authentication, audit logging, rate limiting, and monitoring
+
+## Limitations
+
+- This is synthetic portfolio data, not CMS source data and not production healthcare data.
+- SQLite is the supported local query dialect; several date expressions require changes for PostgreSQL.
+- Payment-integrity rules are transparent examples and may produce false positives.
+- The assistant is not a medical, coding, reimbursement, or fraud-determination system.
+- A real investigation would require policy, contract, coding, clinical, and medical-record evidence not present here.
+- Dashboard PNGs are reproducible analytical previews; a native BI workbook is a future deliverable.
+
+## Documentation
+
+- [Project walkthrough](docs/project_walkthrough.md)
+- [AI architecture and threat model](docs/ai_architecture.md)
+- [Data dictionary](docs/data_dictionary.md)
+- [ETL validation evidence](docs/etl_validation_log.md)
+- [Contributing guide](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
 
 ## Author
 
-**Raghu Vardhan Mutha** — Data Analyst focused on healthcare claims, payment integrity, SQL, data quality, and business intelligence.
+**Raghu Vardhan Mutha**  
+Data Analyst focused on healthcare claims, payment integrity, SQL, data quality, business intelligence, and responsible AI-assisted analytics.
 
 ## License
 
