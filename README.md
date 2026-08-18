@@ -5,6 +5,7 @@
 [![Analytics Pipeline](https://github.com/raghuvardhan-mutha/healthcare-claims-analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/raghuvardhan-mutha/healthcare-claims-analytics/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![SQLite](https://img.shields.io/badge/Warehouse-SQLite-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Snowflake](https://img.shields.io/badge/Enterprise-Snowflake-29B5E8?logo=snowflake&logoColor=white)](snowflake/README.md)
 [![OpenAI](https://img.shields.io/badge/AI-OpenAI%20Responses%20API-412991?logo=openai&logoColor=white)](https://platform.openai.com/docs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -35,6 +36,10 @@ The solution supports **operational and financial decision support rather than c
 - **12-table normalized data model** with diagnosis and procedure bridge tables
 - **30+ SQL analyses** across claims operations, finance, providers, population health, and payment integrity
 - **Six reproducible BI-ready marts** and matching dashboard previews
+- **Working dimensional star schema** with Snowflake deployment and quality-check SQL
+- **Power BI Desktop project source** with a Snowflake semantic model, 16 DAX measures, five report pages, theme, and build specification
+- **Configurable scale profiles** for approximately 40K, 300K, or 1M base claims
+- **Synthetic 837/835 adjudication lifecycle** with billed, allowed, paid, member-responsibility, denial, appeal, and processing-date fields
 - **One-command pipeline** that regenerates data, rebuilds the warehouse, validates it, and refreshes outputs
 - **AI analytics assistant** available through Streamlit and GitHub Issues
 - **Defense-in-depth query security** using a semantic allowlist, SQL AST validation, read-only SQLite, a five-second timeout, and a 200-row limit
@@ -47,7 +52,7 @@ The solution supports **operational and financial decision support rather than c
 | Healthcare analytics | Claims status, denials, reimbursement, readmissions, utilization, provider performance, and payment-integrity review signals |
 | SQL | CTEs, window functions, aggregation, peer benchmarking, multi-table joins, metric definitions, and data-quality checks |
 | Python | Synthetic-data generation, ETL, warehouse loading, validation, data-mart creation, and visualization automation |
-| Business intelligence | Six subject-area marts and six executive-ready dashboard previews |
+| Business intelligence | Power BI Desktop project source, semantic model, DAX KPIs, theme, six subject-area marts, and six executive-ready previews |
 | Responsible AI | Structured SQL planning, approved schema/metrics, query validation, safe execution, visible SQL, and synthetic-data disclaimers |
 | Engineering quality | Reproducible setup, modular code, tests, CI, environment-based secrets, and technical documentation |
 
@@ -56,9 +61,11 @@ The solution supports **operational and financial decision support rather than c
 ```mermaid
 flowchart LR
     A["Synthetic source files"] --> B["Python ETL and validation"]
-    B --> C[("SQLite analytics warehouse")]
+    B --> C[("SQLite normalized warehouse")]
+    C --> S["Dimensional star schema"]
+    S --> W[("Snowflake")]
     C --> D["SQL analysis library"]
-    C --> E["BI-ready data marts"]
+    S --> E["BI-ready data marts"]
     E --> F["Dashboard previews"]
     G["Streamlit or GitHub Issue"] --> H["Guarded AI assistant"]
     H --> C
@@ -68,10 +75,12 @@ flowchart LR
 
 1. `etl/generate_data.py` creates deterministic synthetic claims-style CSV files.
 2. `etl/load_data.py` builds the SQLite warehouse and runs source-to-target validation.
-3. `etl/build_data_marts.py` materializes six analysis-ready CSV marts.
-4. `visualizations/generate_dashboard_previews.py` renders reproducible portfolio visuals.
-5. `ai/assistant.py` translates approved questions into guarded, read-only SQLite queries.
-6. GitHub Actions rebuilds the pipeline and runs all tests on every push and pull request.
+3. `etl/build_star_schema.py` creates a Power BI- and Snowflake-aligned dimensional layer.
+4. `etl/export_star_schema.py` writes validated Snowflake-ready files.
+5. `etl/build_data_marts.py` materializes six analysis-ready CSV marts.
+6. `visualizations/generate_dashboard_previews.py` renders reproducible portfolio visuals.
+7. `ai/assistant.py` translates approved questions into guarded, read-only SQLite queries.
+8. GitHub Actions rebuilds the pipeline and runs all tests on every push and pull request.
 
 ## Dashboard gallery
 
@@ -87,7 +96,7 @@ flowchart LR
 |---|---|
 | ![Chronic-condition prevalence](dashboards/05_patient_chronic_conditions.png) | ![Provider payment-integrity signals](dashboards/06_fraud_risk.png) |
 
-These images are reproducible previews, not screenshots of a committed `.pbix` file. The generated CSV files in `dashboards/data_marts/` are designed to support a Power BI or Tableau layer.
+These images are reproducible previews. A source-controlled Power BI Desktop project aligned to the Snowflake model is included in [`powerbi/`](powerbi/); the generated CSV files in `dashboards/data_marts/` also remain available for lightweight BI prototyping.
 
 ## Reproducible findings
 
@@ -184,6 +193,15 @@ python run_pipeline.py
 
 The pipeline regenerates the synthetic data, rebuilds the warehouse, executes validation, refreshes six marts, and recreates six dashboard previews.
 
+Choose a larger portfolio benchmark when needed:
+
+```bash
+python etl/generate_data.py --scale medium  # approximately 300K base claims
+python etl/generate_data.py --scale large   # 1M base claims
+```
+
+Then run `python etl/load_data.py`, `python etl/build_star_schema.py`, and `python etl/export_star_schema.py`. The default `demo` profile remains fast enough for CI.
+
 ### 3. Run the tests
 
 ```bash
@@ -200,7 +218,11 @@ streamlit run streamlit_app.py
 
 Windows PowerShell users can run `Copy-Item .env.example .env` instead of `cp`.
 
-### 5. Configure the GitHub Issues bot
+### 5. Open the Power BI project
+
+After loading the Snowflake star schema, open [`powerbi/HealthcareClaimsAnalytics.pbip`](powerbi/HealthcareClaimsAnalytics.pbip) in Power BI Desktop, configure the Snowflake parameters, refresh, and apply the included theme. See the [Power BI setup guide](powerbi/README.md) and [report build specification](powerbi/report_build_spec.md).
+
+### 6. Configure the GitHub Issues bot
 
 1. Open **Repository Settings → Secrets and variables → Actions**.
 2. Add a repository secret named `OPENAI_API_KEY`.
@@ -232,7 +254,9 @@ healthcare-claims-analytics/
 ├── data/                      # Generated synthetic data and local DB (git-ignored)
 ├── docs/                      # Architecture, dictionary, walkthrough, and validation evidence
 ├── etl/                       # Data generation, warehouse loading, and mart creation
+├── powerbi/                   # PBIP source, Snowflake semantic model, DAX, theme, and report spec
 ├── scripts/                   # GitHub Issues bot
+├── snowflake/                 # Setup, star-schema DDL, COPY INTO, and quality checks
 ├── sql/                       # Schema and five analytics domains
 ├── tests/                     # Pipeline, AI assistant, and guardrail tests
 ├── visualizations/            # Reproducible chart generation
@@ -245,6 +269,8 @@ healthcare-claims-analytics/
 
 - The data generator uses a fixed seed for repeatable results.
 - Validation covers record counts, required fields, key relationships, and business-rule checks.
+- Adjudication checks enforce date chronology and `paid ≤ allowed ≤ billed` reconciliation.
+- Ground-truth synthetic labels identify deliberately injected review signals for later evaluation.
 - Tests cover the pipeline, AI behavior, and SQL guardrails.
 - CI runs a clean warehouse rebuild and the test suite on pushes and pull requests.
 - Secrets are loaded only from local environment variables or GitHub Actions secrets.
@@ -256,28 +282,33 @@ healthcare-claims-analytics/
 
 - [x] Reproducible synthetic claims pipeline
 - [x] Normalized SQLite warehouse
+- [x] Dimensional star schema and Snowflake deployment scripts
+- [x] Configurable 40K/300K/1M generation profiles
+- [x] Synthetic 837/835 adjudication lifecycle and integrity labels
 - [x] SQL analytics library
 - [x] Six BI-ready marts and dashboard previews
+- [x] Power BI Desktop project source, Snowflake semantic model, DAX KPI layer, theme, and five-page report scaffold
 - [x] Streamlit AI assistant
 - [x] GitHub Issues AI bot
 - [x] SQL guardrails, automated tests, and CI
 - [x] Data dictionary and architecture documentation
+- [x] Business requirements, KPI catalog, UAT plan, Docker, and deployment guide
 
 ### Future extensions
 
 - [ ] Publish a hosted Streamlit demonstration
-- [ ] Add a native Power BI `.pbix` or Tableau workbook
-- [ ] Add labeled anomaly patterns and model evaluation metrics
+- [ ] Publish the Power BI project to a governed Fabric workspace
+- [ ] Add precision, recall, and F1 evaluation for the labeled anomaly patterns
 - [ ] Add production-grade authentication, audit logging, rate limiting, and monitoring
 
 ## Limitations
 
 - This is synthetic portfolio data, not CMS source data and not production healthcare data.
-- SQLite is the supported local query dialect; several date expressions require changes for PostgreSQL.
+- SQLite is the supported zero-configuration local dialect; the `snowflake/` folder provides a separate enterprise deployment path.
 - Payment-integrity rules are transparent examples and may produce false positives.
 - The assistant is not a medical, coding, reimbursement, or fraud-determination system.
 - A real investigation would require policy, contract, coding, clinical, and medical-record evidence not present here.
-- Dashboard PNGs are reproducible analytical previews; a native BI workbook is a future deliverable.
+- The Power BI source is statically validated in CI; a credentialed Snowflake refresh and final visual-layout review require Power BI Desktop on Windows.
 
 ## Documentation
 
@@ -285,6 +316,11 @@ healthcare-claims-analytics/
 - [AI architecture and threat model](docs/ai_architecture.md)
 - [Data dictionary](docs/data_dictionary.md)
 - [ETL validation evidence](docs/etl_validation_log.md)
+- [Business requirements](docs/business_requirements.md)
+- [KPI catalog](docs/kpi_catalog.md)
+- [UAT test plan](docs/uat_test_plan.md)
+- [Deployment guide](docs/deployment.md)
+- [Power BI setup](powerbi/README.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
 

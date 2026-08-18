@@ -13,6 +13,8 @@
 - `prescription_drug_events`: source=18,000 | loaded=18,000 | **OK**
 - `claim_diagnoses`: source=40,514 | loaded=40,514 | **OK**
 - `claim_procedures`: source=37,988 | loaded=37,988 | **OK**
+- `claim_adjudication`: source=40,514 | loaded=40,514 | **OK**
+- `claim_integrity_labels`: source=40,514 | loaded=40,514 | **OK**
 
 ## Referential integrity checks
 - Inpatient claims with no matching beneficiary: **PASS**
@@ -22,6 +24,10 @@
 - Outpatient claims with end date before start date: **PASS**
 - Claims with invalid status values: **PASS**
 - Procedure lines with negative charges: **PASS**
+- Adjudication dates outside submitted-received-adjudicated order: **PASS**
+- Adjudications where paid exceeds allowed or allowed exceeds billed: **PASS**
+- Denied adjudications with a nonzero payment: **PASS**
+- Claims missing an adjudication record: **PASS**
 
 ## Summary
 - Total claims loaded: **40,514** (3,000 inpatient, 12,000 outpatient, 25,514 carrier)

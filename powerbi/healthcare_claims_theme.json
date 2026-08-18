@@ -1,0 +1,28 @@
+{
+  "name": "Healthcare Claims Executive",
+  "dataColors": ["#0B7285", "#1971C2", "#2F9E44", "#F59F00", "#E03131", "#6741D9", "#0CA678", "#495057"],
+  "background": "#F8FAFC",
+  "foreground": "#172B4D",
+  "tableAccent": "#0B7285",
+  "good": "#2F9E44",
+  "neutral": "#F59F00",
+  "bad": "#E03131",
+  "minimum": "#D3F9D8",
+  "center": "#FFF3BF",
+  "maximum": "#FFE3E3",
+  "textClasses": {
+    "callout": {"fontFace": "Segoe UI Semibold", "fontSize": 30, "color": "#172B4D"},
+    "title": {"fontFace": "Segoe UI Semibold", "fontSize": 14, "color": "#172B4D"},
+    "header": {"fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#172B4D"},
+    "label": {"fontFace": "Segoe UI", "fontSize": 10, "color": "#42526E"}
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "visualHeader": [{"show": true, "foreground": {"solid": {"color": "#42526E"}}, "background": {"solid": {"color": "#FFFFFF"}}, "transparency": 15}],
+        "border": [{"show": true, "color": {"solid": {"color": "#E2E8F0"}}, "radius": 8}],
+        "background": [{"show": true, "color": {"solid": {"color": "#FFFFFF"}}, "transparency": 0}]
+      }
+    }
+  }
+}

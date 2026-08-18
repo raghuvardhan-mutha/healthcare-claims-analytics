@@ -27,6 +27,7 @@ TABLE_LOAD_ORDER = [
     "beneficiaries", "chronic_conditions", "providers",
     "inpatient_claims", "outpatient_claims", "carrier_claims",
     "prescription_drug_events", "claim_diagnoses", "claim_procedures",
+    "claim_adjudication", "claim_integrity_labels",
 ]
 
 BOOL_COLUMNS = {
@@ -34,6 +35,8 @@ BOOL_COLUMNS = {
     "chronic_conditions": ["has_condition"],
     "providers": ["npi_flag_suspicious"],
     "drug_codes": ["is_generic"],
+    "claim_adjudication": ["appeal_indicator"],
+    "claim_integrity_labels": ["is_injected_signal"],
 }
 
 
@@ -117,6 +120,18 @@ def run_validation(conn):
          "WHERE claim_status NOT IN ('Paid','Denied','Pending','Appealed')"),
         ("Procedure lines with negative charges",
          "SELECT COUNT(*) FROM claim_procedures WHERE line_charge_amount < 0"),
+        ("Adjudication dates outside submitted-received-adjudicated order",
+         "SELECT COUNT(*) FROM claim_adjudication WHERE received_date < submitted_date "
+         "OR adjudicated_date < received_date OR (payment_date IS NOT NULL AND payment_date < adjudicated_date)"),
+        ("Adjudications where paid exceeds allowed or allowed exceeds billed",
+         "SELECT COUNT(*) FROM claim_adjudication WHERE paid_amount > allowed_amount OR allowed_amount > billed_amount"),
+        ("Denied adjudications with a nonzero payment",
+         "SELECT COUNT(*) FROM claim_adjudication WHERE adjudication_status = 'Denied' AND paid_amount <> 0"),
+        ("Claims missing an adjudication record",
+         "SELECT COUNT(*) FROM (SELECT claim_id, 'inpatient' claim_type FROM inpatient_claims UNION ALL "
+         "SELECT claim_id, 'outpatient' FROM outpatient_claims UNION ALL "
+         "SELECT claim_id, 'carrier' FROM carrier_claims) c LEFT JOIN claim_adjudication a "
+         "ON c.claim_id = a.claim_id AND c.claim_type = a.claim_type WHERE a.claim_id IS NULL"),
     ]
     for label, q in checks:
         cur.execute(q)
@@ -142,8 +157,12 @@ def run_validation(conn):
 
 
 if __name__ == "__main__":
-    if os.path.exists(DB_FILE):
-        os.remove(DB_FILE)
+    # A previous interrupted SQLite write can leave recovery sidecars behind.
+    # Remove the database and only its explicitly named sidecars before a clean
+    # rebuild so an obsolete journal can never be replayed into the new file.
+    for database_file in (DB_FILE, f"{DB_FILE}-journal", f"{DB_FILE}-wal", f"{DB_FILE}-shm"):
+        if os.path.exists(database_file):
+            os.remove(database_file)
     conn = sqlite3.connect(DB_FILE)
     conn.execute("PRAGMA foreign_keys = ON")
     print(f"Building schema from {SCHEMA_FILE} ...")
