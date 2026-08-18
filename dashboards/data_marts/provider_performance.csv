@@ -1,51 +1,51 @@
-provider_id,provider_name,specialty,claims,total_paid,denial_rate_pct
-PRV20353,"Morris, Thompson and Williams Clinic",Psychiatry,35,180753.4,8.57
-PRV20149,"Schmidt, Hansen and Stewart Clinic",Psychiatry,28,176675.61,3.57
-PRV20336,"Newton, Moore and Perry Medical Group",Orthopedic Surgery,36,175428.89,25.0
-PRV20199,Christensen PLC Medical Group,Psychiatry,34,169249.2,23.53
-PRV20342,Lopez-Martinez Medical Group,Psychiatry,40,166590.14,15.0
-PRV20019,"Reid, Ferguson and Sanchez Medical Group",Radiology,34,166549.13,8.82
-PRV20193,Reid-Poole Clinic,Orthopedic Surgery,37,165919.63,2.7
-PRV20237,"Hall, Baker and Moody Clinic",Radiology,27,162590.8,0.0
-PRV20061,Powell LLC Clinic,Internal Medicine,32,149264.55,0.0
-PRV20226,Miller-Wright Medical Group,Family Practice,42,145636.89,4.76
-PRV20039,"Romero, Gonzalez and Brooks Medical Group",Anesthesiology,33,145195.27,15.15
-PRV20308,"Phillips, Spence and Barrett Medical Group",Emergency Medicine,33,144023.18,12.12
-PRV20304,"Evans, Hayden and Vaughn Medical Group",Cardiology,28,141373.26,17.86
-PRV20015,Galloway-Wyatt Medical Group,Emergency Medicine,36,140494.12,8.33
-PRV20261,"Anderson, Roberts and Gilmore Clinic",Anesthesiology,30,138921.7,10.0
-PRV20337,Bass PLC Clinic,Oncology,34,138534.45,5.88
-PRV20262,Martinez-Dudley Clinic,General Surgery,40,134291.33,2.5
-PRV20364,"Phillips, Wagner and Jordan Medical Group",Cardiology,36,132091.4,8.33
-PRV20051,Walker LLC Clinic,Internal Medicine,39,131825.63,12.82
-PRV20016,James Group Medical Group,Neurology,37,131791.97,8.11
-PRV20073,"Stanley, Tucker and Lee Medical Group",Radiology,36,131475.95,11.11
-PRV20109,Johnson-Doyle Medical Group,Orthopedic Surgery,32,131335.41,6.25
-PRV20033,Frazier Inc Clinic,Orthopedic Surgery,33,130440.91,6.06
-PRV20361,Lam LLC Medical Group,Oncology,28,129677.65,14.29
-PRV20301,Estrada-Nolan Clinic,Anesthesiology,41,129537.36,12.2
-PRV20359,Boone-Simmons Clinic,Orthopedic Surgery,32,129443.6,9.38
-PRV20329,Herman-Walker Medical Group,Radiology,31,128571.16,3.23
-PRV20186,Sanders-Espinoza Medical Group,Nephrology,36,126036.15,5.56
-PRV20080,"Sanchez, Wheeler and Harvey Clinic",Cardiology,36,126029.02,13.89
-PRV20230,"Branch, Torres and Oliver Medical Group",Orthopedic Surgery,32,124950.66,3.13
-PRV20182,Jackson-Lawson Medical Group,General Surgery,38,124609.65,5.26
-PRV20235,"Harrison, Johnson and Roberts Medical Group",Internal Medicine,18,123774.96,0.0
-PRV20157,"Miller, Hernandez and Reyes Clinic",Psychiatry,38,122730.44,15.79
-PRV20070,Gray Group Medical Group,Family Practice,32,121341.5,9.38
-PRV20066,Williams PLC Clinic,General Surgery,20,121229.66,15.0
-PRV20018,"Adams, Zuniga and Wong Clinic",Neurology,32,120665.04,18.75
-PRV20203,"Beard, Peters and Black Clinic",Cardiology,33,120265.52,6.06
-PRV20355,Strickland-Palmer Medical Group,Orthopedic Surgery,31,119815.96,9.68
-PRV20196,Marshall-Petersen Medical Group,Orthopedic Surgery,37,119686.88,5.41
-PRV20029,"Snyder, Campos and Callahan Medical Group",Psychiatry,30,119476.25,6.67
-PRV20376,Schmitt PLC Clinic,Cardiology,40,119221.26,5.0
-PRV20118,May-Ross Clinic,Internal Medicine,31,118924.81,9.68
-PRV20094,Campbell-Clark Medical Group,Nephrology,26,118419.4,3.85
-PRV20170,Meadows PLC Medical Group,Orthopedic Surgery,31,117835.7,12.9
-PRV20258,Gutierrez-Lopez Medical Group,Internal Medicine,41,117386.77,4.88
-PRV20017,"Flowers, Martin and Kelly Clinic",Nephrology,42,117129.28,16.67
-PRV20000,"Rodriguez, Figueroa and Sanchez Medical Group",Radiology,32,115108.82,12.5
-PRV20340,Garcia-Jennings Medical Group,Neurology,29,115077.84,10.34
-PRV20060,"Brown, Valdez and Lucas Medical Group",Nephrology,30,114767.78,3.33
-PRV20031,Carlson-Cruz Clinic,Orthopedic Surgery,29,114652.82,6.9
+provider_id,provider_name,specialty,claims,total_paid,avg_paid
+PRV20011,Dudley Group Clinic,General Surgery,215,922951.43,4292.8
+PRV20010,Blair PLC Clinic,Radiology,226,766658.16,3392.29
+PRV20000,"Rodriguez, Figueroa and Sanchez Medical Group",Radiology,225,746093.08,3315.97
+PRV20003,Davis and Sons Medical Group,Oncology,200,744022.41,3720.11
+PRV20006,Blake and Sons Clinic,Internal Medicine,209,725458.21,3471.09
+PRV20009,Abbott-Munoz Medical Group,Emergency Medicine,208,700004.62,3365.41
+PRV20002,"Mcclain, Miller and Henderson Medical Group",Family Practice,217,671398.84,3094.0
+PRV20005,"Gardner, Robinson and Lawrence Medical Group",Nephrology,206,630622.58,3061.27
+PRV20007,"Henderson, Ramirez and Lewis Clinic",Nephrology,210,594361.78,2830.29
+PRV20008,Garcia-James Clinic,Cardiology,157,566206.36,3606.41
+PRV20001,Doyle Ltd Clinic,Cardiology,216,551987.26,2555.5
+PRV20223,Wilson-Jones Clinic,Oncology,115,524950.91,4564.79
+PRV20227,"Duran, Obrien and Gibbs Clinic",Emergency Medicine,102,481595.78,4721.53
+PRV20004,"Guzman, Hoffman and Baldwin Medical Group",Neurology,199,480224.93,2413.19
+PRV20146,Robinson-Brock Medical Group,Oncology,114,473002.6,4149.15
+PRV20090,"Turner, Riggs and Roman Clinic",Orthopedic Surgery,99,462500.08,4671.72
+PRV20175,King-Miller Medical Group,Anesthesiology,106,458612.92,4326.54
+PRV20347,Willis and Sons Medical Group,Family Practice,110,447875.94,4071.6
+PRV20219,Terry-Martinez Clinic,Oncology,90,440519.07,4894.66
+PRV20083,"Edwards, Baker and Anderson Clinic",Psychiatry,113,436440.97,3862.31
+PRV20301,Estrada-Nolan Clinic,Anesthesiology,91,435210.53,4782.53
+PRV20137,"Jackson, Miller and Robertson Medical Group",Nephrology,110,434584.38,3950.77
+PRV20033,Frazier Inc Clinic,Orthopedic Surgery,106,434025.72,4094.58
+PRV20144,Hernandez Ltd Medical Group,Neurology,112,427566.54,3817.56
+PRV20138,"Harvey, Davis and Crane Medical Group",Radiology,112,427216.04,3814.43
+PRV20383,"Gallegos, Adams and White Clinic",Orthopedic Surgery,111,425949.27,3837.38
+PRV20238,"Guerrero, Peck and Coleman Medical Group",Psychiatry,98,423818.53,4324.68
+PRV20355,Strickland-Palmer Medical Group,Orthopedic Surgery,109,417225.25,3827.75
+PRV20072,Henderson-Bernard Medical Group,Oncology,96,417012.8,4343.88
+PRV20019,"Reid, Ferguson and Sanchez Medical Group",Radiology,99,415213.78,4194.08
+PRV20142,Gibson Ltd Medical Group,Radiology,106,415024.53,3915.33
+PRV20024,"Walter, Edwards and Rios Medical Group",Orthopedic Surgery,92,411501.86,4472.85
+PRV20088,Suarez LLC Clinic,Nephrology,108,410142.25,3797.61
+PRV20278,Pollard and Sons Clinic,Emergency Medicine,89,407708.05,4580.99
+PRV20254,Roberts-Landry Medical Group,Internal Medicine,106,407601.99,3845.3
+PRV20176,Curry Inc Clinic,Internal Medicine,117,403668.16,3450.16
+PRV20055,Jones-Young Clinic,General Surgery,104,402636.88,3871.51
+PRV20171,"Alvarado, Miller and Patterson Clinic",Orthopedic Surgery,93,402324.85,4326.07
+PRV20214,"Washington, Hardy and Bray Medical Group",Emergency Medicine,95,398624.18,4196.04
+PRV20275,"Burns, Hernandez and Ryan Clinic",Anesthesiology,99,398481.59,4025.07
+PRV20248,Johnston-Hines Medical Group,Psychiatry,115,391318.27,3402.77
+PRV20333,Davis PLC Clinic,Internal Medicine,120,388148.1,3234.57
+PRV20292,Bright-Francis Medical Group,Internal Medicine,104,387116.46,3722.27
+PRV20037,"Baker, Mason and White Medical Group",Internal Medicine,93,385062.72,4140.46
+PRV20387,Davis PLC Clinic,Anesthesiology,103,384484.83,3732.86
+PRV20257,"Bryan, Smith and Booth Clinic",Family Practice,114,382913.53,3358.89
+PRV20173,Lewis-Murphy Clinic,Cardiology,105,381581.86,3634.11
+PRV20273,Hoover-Campbell Clinic,Family Practice,117,381168.6,3257.85
+PRV20092,"Garcia, Humphrey and Baker Medical Group",Radiology,84,380873.74,4534.21
+PRV20392,Webster Inc Clinic,Oncology,112,379193.1,3385.65

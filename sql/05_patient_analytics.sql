@@ -52,10 +52,10 @@ LEFT JOIN claim_counts cl ON c.beneficiary_id = cl.beneficiary_id
 GROUP BY c.condition_count
 ORDER BY c.condition_count;
 
--- Q5. Geographic distribution of beneficiaries and their average annual spend by state
+-- Q5. Geographic distribution and average three-year paid amount per beneficiary
 SELECT b.state, COUNT(DISTINCT b.beneficiary_id) AS beneficiaries,
        ROUND(SUM(t.paid), 2) AS total_paid,
-       ROUND(SUM(t.paid) / COUNT(DISTINCT b.beneficiary_id), 2) AS avg_paid_per_beneficiary
+       ROUND(SUM(t.paid) / COUNT(DISTINCT b.beneficiary_id), 2) AS avg_three_year_paid_per_beneficiary
 FROM beneficiaries b
 JOIN (
     SELECT beneficiary_id, claim_payment_amount AS paid FROM inpatient_claims
@@ -63,7 +63,7 @@ JOIN (
     UNION ALL SELECT beneficiary_id, claim_payment_amount FROM carrier_claims
 ) t ON b.beneficiary_id = t.beneficiary_id
 GROUP BY b.state
-ORDER BY avg_paid_per_beneficiary DESC;
+ORDER BY avg_three_year_paid_per_beneficiary DESC;
 
 -- Q6. Readmission signal: beneficiaries with 2+ inpatient admissions within 30 days of each other
 WITH ordered AS (
@@ -74,6 +74,6 @@ WITH ordered AS (
 SELECT beneficiary_id, COUNT(*) AS readmissions_within_30d
 FROM ordered
 WHERE prev_discharge IS NOT NULL
-  AND julianday(admission_date) - julianday(prev_discharge) <= 30
+  AND julianday(admission_date) - julianday(prev_discharge) BETWEEN 0 AND 30
 GROUP BY beneficiary_id
 ORDER BY readmissions_within_30d DESC;

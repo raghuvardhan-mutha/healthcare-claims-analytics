@@ -65,18 +65,31 @@ LIMIT 25;
 
 -- Q4. PROVIDER-LEVEL FRAUD RISK SCORE
 -- Combines three signals into a single ranked risk score per provider:
---   - unbundling rate (avg line items per claim)
+--   - unbundled-claim count
 --   - duplicate billing occurrences
 --   - cost variance vs specialty peers
-WITH unbundling AS (
-    SELECT o.provider_id, AVG(sub.line_items) AS avg_line_items
+WITH outpatient_lines AS (
+    SELECT o.provider_id, o.claim_id, COUNT(cp.procedure_code) AS line_items
     FROM outpatient_claims o
-    JOIN (
-        SELECT claim_id, COUNT(*) AS line_items
-        FROM claim_procedures WHERE claim_type = 'outpatient'
-        GROUP BY claim_id
-    ) sub ON o.claim_id = sub.claim_id
-    GROUP BY o.provider_id
+    JOIN claim_procedures cp ON o.claim_id = cp.claim_id AND cp.claim_type = 'outpatient'
+    GROUP BY o.provider_id, o.claim_id
+),
+unbundling AS (
+    SELECT provider_id, AVG(line_items) AS avg_line_items,
+           SUM(CASE WHEN line_items >= 3 THEN 1 ELSE 0 END) AS unbundled_claims
+    FROM outpatient_lines GROUP BY provider_id
+),
+duplicate_groups AS (
+    SELECT cc.provider_id, cc.beneficiary_id, cc.claim_start_date, cp.procedure_code,
+           COUNT(DISTINCT cc.claim_id) AS billed_count
+    FROM carrier_claims cc
+    JOIN claim_procedures cp ON cc.claim_id = cp.claim_id AND cp.claim_type = 'carrier'
+    GROUP BY cc.provider_id, cc.beneficiary_id, cc.claim_start_date, cp.procedure_code
+    HAVING COUNT(DISTINCT cc.claim_id) >= 2
+),
+duplicates AS (
+    SELECT provider_id, COUNT(*) AS duplicate_groups
+    FROM duplicate_groups GROUP BY provider_id
 ),
 cost_variance AS (
     SELECT o.provider_id, AVG(o.claim_payment_amount) AS avg_paid
@@ -92,14 +105,20 @@ specialty_avg AS (
 )
 SELECT p.provider_id, p.provider_name, p.specialty, p.npi_flag_suspicious,
        ROUND(u.avg_line_items, 2) AS avg_line_items_per_claim,
+       u.unbundled_claims,
+       COALESCE(d.duplicate_groups, 0) AS duplicate_groups,
        ROUND(cv.avg_paid, 2) AS avg_claim_payment,
        ROUND(cv.avg_paid / sa.specialty_avg_paid, 2) AS cost_vs_peer_ratio,
        ROUND(
-           (u.avg_line_items / 1.0) + (cv.avg_paid / sa.specialty_avg_paid), 2
+           2.0 * u.unbundled_claims
+           + 3.0 * COALESCE(d.duplicate_groups, 0)
+           + 10.0 * MAX(cv.avg_paid / NULLIF(sa.specialty_avg_paid, 0) - 1.0, 0),
+           2
        ) AS composite_risk_score
 FROM providers p
 JOIN unbundling u ON p.provider_id = u.provider_id
 JOIN cost_variance cv ON p.provider_id = cv.provider_id
 JOIN specialty_avg sa ON p.specialty = sa.specialty
+LEFT JOIN duplicates d ON p.provider_id = d.provider_id
 ORDER BY composite_risk_score DESC
 LIMIT 20;

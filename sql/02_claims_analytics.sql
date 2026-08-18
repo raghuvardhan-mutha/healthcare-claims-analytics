@@ -36,7 +36,7 @@ JOIN providers p ON o.provider_id = p.provider_id
 GROUP BY p.specialty
 ORDER BY denial_rate_pct DESC;
 
--- Q4. Average claim turnaround (start to end date span) by claim type
+-- Q4. Average service duration (claim start to claim end) by claim type
 SELECT 'Inpatient' AS claim_type,
        ROUND(AVG(julianday(claim_end_date) - julianday(claim_start_date)), 1) AS avg_days
 FROM inpatient_claims
@@ -64,7 +64,7 @@ GROUP BY d.diagnosis_code, d.description, d.category
 ORDER BY claim_count DESC
 LIMIT 10;
 
--- Q7. Claims with pending status older than 30 days (aging / backlog risk)
+-- Q7. Claims pending more than 30 days at the historical snapshot date
 SELECT claim_id, beneficiary_id, claim_start_date,
        CAST(julianday('2024-01-01') - julianday(claim_start_date) AS INTEGER) AS days_pending
 FROM outpatient_claims

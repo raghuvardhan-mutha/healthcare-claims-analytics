@@ -83,6 +83,7 @@ def run_validation(conn):
     cur = conn.cursor()
 
     lines.append("## Row counts (source CSV -> target table)")
+    validation_passed = True
     for t in TABLE_LOAD_ORDER:
         src_path = os.path.join(DATA_DIR, f"{t}.csv")
         with open(src_path) as f:
@@ -90,6 +91,7 @@ def run_validation(conn):
         cur.execute(f"SELECT COUNT(*) FROM {t}")
         tgt_count = cur.fetchone()[0]
         status = "OK" if src_count == tgt_count else "MISMATCH"
+        validation_passed = validation_passed and src_count == tgt_count
         lines.append(f"- `{t}`: source={src_count:,} | loaded={tgt_count:,} | **{status}**")
 
     lines.append("\n## Referential integrity checks")
@@ -105,11 +107,22 @@ def run_validation(conn):
         ("Claim diagnoses referencing unknown diagnosis codes",
          "SELECT COUNT(*) FROM claim_diagnoses cd LEFT JOIN diagnosis_codes d "
          "ON cd.diagnosis_code = d.diagnosis_code WHERE d.diagnosis_code IS NULL"),
+        ("Outpatient claims with end date before start date",
+         "SELECT COUNT(*) FROM outpatient_claims WHERE claim_end_date < claim_start_date"),
+        ("Claims with invalid status values",
+         "SELECT COUNT(*) FROM ("
+         "SELECT claim_status FROM inpatient_claims UNION ALL "
+         "SELECT claim_status FROM outpatient_claims UNION ALL "
+         "SELECT claim_status FROM carrier_claims) "
+         "WHERE claim_status NOT IN ('Paid','Denied','Pending','Appealed')"),
+        ("Procedure lines with negative charges",
+         "SELECT COUNT(*) FROM claim_procedures WHERE line_charge_amount < 0"),
     ]
     for label, q in checks:
         cur.execute(q)
         n = cur.fetchone()[0]
         status = "PASS" if n == 0 else f"FLAGGED ({n} rows)"
+        validation_passed = validation_passed and n == 0
         lines.append(f"- {label}: **{status}**")
 
     lines.append("\n## Summary")
@@ -121,7 +134,7 @@ def run_validation(conn):
     cc = cur.fetchone()[0]
     total = ip + op + cc
     lines.append(f"- Total claims loaded: **{total:,}** ({ip:,} inpatient, {op:,} outpatient, {cc:,} carrier)")
-    lines.append(f"- Data quality compliance: **{'100%' if all('PASS' in l or 'MISMATCH' not in l for l in lines) else 'see flags above'}**")
+    lines.append(f"- Validation result: **{'PASS' if validation_passed else 'REVIEW FLAGS ABOVE'}**")
 
     with open(LOG_FILE, "w") as f:
         f.write("\n".join(lines))
@@ -132,6 +145,7 @@ if __name__ == "__main__":
     if os.path.exists(DB_FILE):
         os.remove(DB_FILE)
     conn = sqlite3.connect(DB_FILE)
+    conn.execute("PRAGMA foreign_keys = ON")
     print(f"Building schema from {SCHEMA_FILE} ...")
     build_schema(conn)
     print("Loading CSVs...\n")

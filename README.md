@@ -1,154 +1,143 @@
-# Healthcare Claims Analytics Platform
+# Healthcare Claims & Payment Integrity Analytics
 
-An end-to-end healthcare claims analytics project: a normalized data model,
-Python ETL pipeline, 30+ SQL analytics queries, and dashboard-ready data
-marts covering claims operations, financials, provider performance, patient
-population health, and payment-integrity (fraud) analytics.
+[![Analytics Pipeline](https://github.com/raghuvardhan-mutha/healthcare-claims-analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/raghuvardhan-mutha/healthcare-claims-analytics/actions/workflows/ci.yml)
 
-Built as a portfolio project modeled on CMS's DE-SynPUF Medicare claims file
-structure, and on real claims-analytics work I do as a Data Analyst on
-United Health Group's Claims & Payment Integrity team — including a
-window-function-based unbundled/duplicate-billing detection approach adapted
-from an actual investigation I ran there.
+An end-to-end healthcare analytics portfolio project that turns deterministic synthetic Medicare-style claims into a normalized SQLite warehouse, validated SQL analyses, dashboard data marts, and reproducible visual outputs.
 
-## Why this project
+> **Important:** All patients, providers, claims, and results are synthetic. Payment-integrity signals identify records for review; they do not prove fraud.
 
-Most portfolio projects stop at "load a CSV, make a chart." This one is
-built the way a claims analytics team actually works: a proper relational
-schema instead of one flat table, ETL with source-to-target validation
-(not just a happy-path load), SQL organized by business domain the way a
-BI team would hand it off, and a fraud-detection module that mirrors a
-real payment-integrity workflow rather than a generic anomaly-detection demo.
+## Project highlights
 
-## Data note
+- **40,514 claims** across inpatient, outpatient, and professional/carrier services
+- **12-table normalized model** with claim-to-diagnosis and claim-to-procedure bridges
+- **30+ SQL analyses** covering claims operations, finance, providers, population health, and payment integrity
+- Explainable risk signals for duplicate billing, potential unbundling, and DRG payment outliers
+- Automated source-to-target and data-quality validation
+- Six reproducible dashboard-ready marts and portfolio previews
+- One-command pipeline with automated tests and GitHub Actions
 
-This repo uses **synthetic data generated to match the structure of CMS's
-DE-SynPUF** (Data Entrepreneurs' Synthetic Public Use Files) — same table
-shapes, realistic ICD/CPT/NDC-style codes, realistic dollar ranges — rather
-than the actual CMS files, so the project can be run and reviewed without a
-data use agreement or a multi-GB download. A small number of claims (~2%)
-have deliberately injected fraud patterns (unbundled billing, duplicate
-claims, upcoded DRGs) so the payment-integrity SQL has real signal to catch.
-See `etl/generate_data.py` for exactly how each pattern is injected.
+## Dashboard preview
+
+| Executive overview | Claims status |
+|---|---|
+| ![Monthly claim payments](dashboards/01_executive_summary.png) | ![Claims status distribution](dashboards/02_claims_status.png) |
+
+| Provider performance | Payment integrity |
+|---|---|
+| ![Provider performance](dashboards/04_provider_performance.png) | ![Provider payment-integrity risk](dashboards/06_fraud_risk.png) |
+
+Additional views: [financial performance](dashboards/03_financial_by_specialty.png) and [population health](dashboards/05_patient_chronic_conditions.png).
+
+## Reproducible sample findings
+
+The seeded dataset produces the following results when run with the fixed random seed:
+
+| Metric | Result | Operational interpretation |
+|---|---:|---|
+| Total claims | 40,514 | Combined inpatient, outpatient, and carrier volume |
+| Total paid amount | $118.5M | Synthetic paid amount across three service years |
+| Denial rate | 7.7% | Starting point for denial root-cause analysis |
+| Potential unbundled claims | 237 | Outpatient claims with three or more procedure lines |
+| Potential duplicate groups | 514 | Same beneficiary, provider, procedure, and service date across multiple claim IDs |
+| 30-day readmission signals | 47 | Admissions occurring 0–30 days after a prior discharge |
+
+These indicators would support investigation queues, provider education, prepayment edits, and focused denial-reduction work. They require clinical and coding review before action.
 
 ## Architecture
 
-```
-CSV generation (synthetic, DE-SynPUF-shaped)
-        │
-        ▼
-Python ETL  ──►  SQLite (portable; schema also runs unmodified on PostgreSQL)
-        │              │
-        │              ▼
-        │        30+ SQL analytics queries (5 domains)
-        │              │
-        ▼              ▼
-  Validation log   Pre-aggregated data marts ──► Power BI / dashboard visuals
+```mermaid
+flowchart TD
+    A[Deterministic synthetic CSVs] --> B[Python ETL]
+    B --> C[(SQLite analytics warehouse)]
+    C --> D[Validated SQL analyses]
+    C --> E[Dashboard data marts]
+    E --> F[Portfolio previews / Power BI]
+    B --> G[Data-quality log]
 ```
 
 ## Data model
 
-12 tables, normalized around Medicare's real claim-type split (inpatient /
-outpatient / carrier / Part D), with reference tables for diagnosis,
-procedure, and drug codes, and bridge tables for the claim↔diagnosis and
-claim↔procedure many-to-many relationships:
+The model is inspired by Medicare claims concepts while remaining intentionally smaller than official CMS datasets.
 
-`beneficiaries` · `chronic_conditions` · `providers` · `inpatient_claims` ·
-`outpatient_claims` · `carrier_claims` · `prescription_drug_events` ·
-`diagnosis_codes` · `procedure_codes` · `drug_codes` · `claim_diagnoses` ·
-`claim_procedures`
+- Members: `beneficiaries`, `chronic_conditions`
+- Providers: `providers`
+- Claim facts: `inpatient_claims`, `outpatient_claims`, `carrier_claims`
+- Pharmacy facts: `prescription_drug_events`
+- Code dimensions: `diagnosis_codes`, `procedure_codes`, `drug_codes`
+- Bridges: `claim_diagnoses`, `claim_procedures`
 
-Full DDL: [`sql/01_schema.sql`](sql/01_schema.sql)
+See the [data dictionary](docs/data_dictionary.md) and [schema DDL](sql/01_schema.sql).
 
-## SQL analytics (5 domains, 30 queries)
+## Analytics domains
 
-| File | Domain | Highlights |
-|---|---|---|
-| [`sql/02_claims_analytics.sql`](sql/02_claims_analytics.sql) | Claims operations | Denial rates by specialty/state, claim aging, monthly volume trend |
-| [`sql/03_financial_analytics.sql`](sql/03_financial_analytics.sql) | Financial | Charge-to-paid ratio, cost per chronic condition, MoM revenue trend |
-| [`sql/04_provider_analytics.sql`](sql/04_provider_analytics.sql) | Provider performance | Cost-per-claim vs. specialty peer average, utilization outliers |
-| [`sql/05_patient_analytics.sql`](sql/05_patient_analytics.sql) | Patient population | Comorbidity burden, utilization by condition count, 30-day readmissions |
-| [`sql/06_fraud_detection.sql`](sql/06_fraud_detection.sql) | Payment integrity | Unbundling & duplicate-billing detection via window functions, composite provider risk score |
+| SQL file | Business questions |
+|---|---|
+| [Claims operations](sql/02_claims_analytics.sql) | Volume, status mix, denial rates, service duration, aging, and appeals |
+| [Financial analytics](sql/03_financial_analytics.sql) | Paid trends, charge-to-paid ratio, high-cost members, and drug spending |
+| [Provider analytics](sql/04_provider_analytics.sql) | Peer benchmarks, denial performance, utilization, and cost outliers |
+| [Population health](sql/05_patient_analytics.sql) | Prevalence, comorbidity, utilization, geography, and readmission signals |
+| [Payment integrity](sql/06_fraud_detection.sql) | Potential unbundling, duplicate billing, DRG outliers, and provider risk ranking |
 
-The fraud-detection queries use `PARTITION BY` / `ROW_NUMBER()` /
-`COUNT() OVER()` to find claims sharing beneficiary + provider + date of
-service billed as multiple line items or duplicate claim IDs — the same
-technique behind a real unbundling pattern I found in production claims
-data, which led to a systematic billing edit and $1.2M in recovered revenue.
+The composite provider score includes all three documented components: unbundled-claim count, duplicate groups, and cost variance versus specialty peers.
 
-## Dashboards
+## Run locally
 
-Six dashboard pages, each backed by a pre-aggregated data mart in
-`dashboards/data_marts/` and previewed as a static chart in `dashboards/`:
-
-1. **Executive Summary** — monthly paid claims & volume trend
-2. **Claims** — claim status mix (paid/denied/pending/appealed)
-3. **Financial** — total paid by specialty
-4. **Provider** — top providers by paid amount
-5. **Patient** — chronic condition prevalence
-6. **Fraud / Payment Integrity** — provider risk ranking (unbundling signal)
-
-The data marts are plain CSVs designed to drop straight into Power BI
-(or Tableau/Looker) — each is already grouped/aggregated at the grain the
-dashboard page needs, so building the `.pbix` on top is mostly
-visual layout rather than data modeling.
-
-## Project structure
-
-```
-healthcare-claims-analytics/
-├── README.md
-├── sql/
-│   ├── 01_schema.sql              # DDL — 12-table normalized schema
-│   ├── 02_claims_analytics.sql
-│   ├── 03_financial_analytics.sql
-│   ├── 04_provider_analytics.sql
-│   ├── 05_patient_analytics.sql
-│   └── 06_fraud_detection.sql
-├── etl/
-│   ├── generate_data.py           # synthetic data generator (DE-SynPUF-shaped)
-│   └── load_data.py               # loads CSVs -> DB, runs validation checks
-├── data/                          # generated CSVs + claims_analytics.db
-├── dashboards/
-│   ├── 01_executive_summary.png ... 06_fraud_risk.png
-│   └── data_marts/                # pre-aggregated CSVs for BI tools
-└── docs/
-    └── etl_validation_log.md      # source-to-target row counts, DQ checks
-```
-
-## How to run it
+Requires Python 3.11 or newer.
 
 ```bash
-# 1. Install dependencies
-pip install faker pandas matplotlib
+git clone https://github.com/raghuvardhan-mutha/healthcare-claims-analytics.git
+cd healthcare-claims-analytics
+python -m venv .venv
 
-# 2. Generate the synthetic dataset (writes CSVs to data/)
-python etl/generate_data.py
+# macOS/Linux
+source .venv/bin/activate
 
-# 3. Build schema + load into SQLite, run validation checks
-python etl/load_data.py
+# Windows PowerShell
+# .venv\Scripts\Activate.ps1
 
-# 4. Explore the analytics
-sqlite3 data/claims_analytics.db
-sqlite> .read sql/06_fraud_detection.sql
+pip install -r requirements.txt
+python run_pipeline.py
+python -m pytest -q
 ```
 
-To point this at PostgreSQL instead of SQLite: run `sql/01_schema.sql`
-against your Postgres instance, then swap the `sqlite3` connection in
-`etl/load_data.py` for `psycopg2` (the schema and all analytics SQL are
-already written in standard, Postgres-compatible SQL).
+The pipeline regenerates the synthetic CSVs, rebuilds the warehouse, runs validation, refreshes all six marts, and recreates the preview images.
 
-## Dataset scale
+## Repository structure
 
-~5,000 beneficiaries · 400 providers · ~40,000 claims (inpatient/outpatient/
-carrier) · 18,000 prescription drug events · 3 years of claim history
-(2021–2023).
+```text
+healthcare-claims-analytics/
+├── .github/workflows/ci.yml
+├── data/                         # generated synthetic CSVs and local DB (git-ignored)
+├── dashboards/
+│   ├── data_marts/               # reproducible BI-ready outputs
+│   └── *.png                     # reproducible portfolio previews
+├── docs/
+│   ├── data_dictionary.md
+│   └── etl_validation_log.md
+├── etl/
+│   ├── generate_data.py
+│   ├── load_data.py
+│   └── build_data_marts.py
+├── sql/                          # schema plus five analytics domains
+├── tests/test_pipeline.py
+├── visualizations/generate_dashboard_previews.py
+├── requirements.txt
+└── run_pipeline.py
+```
 
-## Stack
+## Design decisions and limitations
 
-Python (pandas, Faker) · SQL (window functions, CTEs) · SQLite/PostgreSQL ·
-Power BI-ready data marts · Git
+- Synthetic data uses a fixed seed so results are reproducible.
+- The local demo uses SQLite. Some analytics queries use SQLite date functions such as `strftime` and `julianday`; PostgreSQL would require dialect-specific date replacements.
+- The warehouse loader translates PostgreSQL-oriented `NUMERIC` and `BOOLEAN` types for SQLite.
+- Risk rules are transparent portfolio examples, not production fraud models.
+- Clinical appropriateness, coding policy, contracts, and medical records are outside this dataset and would be required for a real payment-integrity determination.
+- Static images demonstrate the analytical story. A `.pbix` or Tableau workbook can be layered onto the generated marts as a separate BI deliverable.
 
-## About this project
+## Author
 
-Built by Raghu Vardhan Mutha, Data Analyst — Claims & Payment Integrity .
+**Raghu Vardhan Mutha** — Data Analyst focused on healthcare claims, payment integrity, SQL, data quality, and business intelligence.
+
+## License
+
+Released under the [MIT License](LICENSE).

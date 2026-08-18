@@ -1,8 +1,8 @@
 -- ============================================================================
 -- Healthcare Claims Analytics — Normalized Schema
 -- Source: CMS DE-SynPUF-style synthetic Medicare claims data
--- Engine: Written in standard SQL (PostgreSQL syntax). Also runs on SQLite
---         (used for this repo's local demo — see etl/load_data.py)
+-- Engine: PostgreSQL-oriented DDL. The local SQLite loader applies documented
+--         NUMERIC/BOOLEAN type translations in etl/load_data.py.
 -- ============================================================================
 
 DROP TABLE IF EXISTS claim_procedures;

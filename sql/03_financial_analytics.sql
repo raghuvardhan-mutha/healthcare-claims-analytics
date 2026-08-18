@@ -9,6 +9,9 @@ FROM inpatient_claims GROUP BY 1
 UNION ALL
 SELECT strftime('%Y', claim_start_date) AS claim_year, 'Outpatient', SUM(claim_payment_amount)
 FROM outpatient_claims GROUP BY 1
+UNION ALL
+SELECT strftime('%Y', claim_start_date) AS claim_year, 'Carrier', SUM(claim_payment_amount)
+FROM carrier_claims GROUP BY 1
 ORDER BY claim_year, claim_type;
 
 -- Q2. Charge-to-payment ratio (how much billed vs actually paid) -- payment integrity signal

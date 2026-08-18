@@ -31,7 +31,7 @@ N_INPATIENT = 3000
 N_OUTPATIENT = 12000
 N_CARRIER = 25000
 N_PDE = 18000
-FRAUD_RATE = 0.02  # ~2% of claims carry an injected fraud pattern
+FRAUD_RATE = 0.02  # deterministic target rate within each applicable claim type
 
 OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -205,16 +205,18 @@ def generate_claims(bene_ids, provider_ids, suspicious_providers):
         for i in range(N_INPATIENT):
             cid = f"IP{500000+i}"
             bid = random.choice(bene_ids)
-            pid = random.choice(provider_ids)
+            is_fraud = random.random() < FRAUD_RATE
+            pid = random.choice(suspicious_providers if is_fraud else provider_ids)
             admit = rand_date()
             los = random.randint(1, 12)
             discharge = admit + timedelta(days=los)
             base_pay = round(random.uniform(4000, 28000), 2)
-            is_fraud = pid in suspicious_providers and random.random() < 0.4
             if is_fraud:
                 base_pay = round(base_pay * random.uniform(1.6, 2.3), 2)  # upcoded DRG payment spike
             charge = round(base_pay * random.uniform(1.15, 1.6), 2)
             status = random.choices(["Paid", "Denied", "Pending", "Appealed"], weights=[82, 8, 6, 4])[0]
+            if status in ("Denied", "Pending"):
+                base_pay = 0.0
             w.writerow([cid, bid, pid, admit.isoformat(), discharge.isoformat(),
                         admit.isoformat(), discharge.isoformat(),
                         random.choice(DRG_CODES), base_pay, charge,
@@ -230,24 +232,26 @@ def generate_claims(bene_ids, provider_ids, suspicious_providers):
         for i in range(N_OUTPATIENT):
             cid = f"OP{700000+i}"
             bid = random.choice(bene_ids)
-            pid = random.choice(provider_ids)
+            is_fraud = random.random() < FRAUD_RATE
+            pid = random.choice(suspicious_providers if is_fraud else provider_ids)
             d = rand_date()
             proc_code, base_amt = random.choice(proc_codes)
             pay = round(base_amt * random.uniform(0.85, 1.1), 2)
             charge = round(pay * random.uniform(1.2, 1.8), 2)
             status = random.choices(["Paid", "Denied", "Pending", "Appealed"], weights=[80, 10, 6, 4])[0]
+            if status in ("Denied", "Pending"):
+                pay = 0.0
             w.writerow([cid, bid, pid, d.isoformat(), d.isoformat(), pay, charge,
                         round(random.uniform(0, 250), 2), status])
             diag_rows.append((cid, "outpatient", random.choice(diag_codes), 1))
 
             # normal claim: 1 procedure line. Fraud pattern: unbundling -> same
             # service billed as 3-4 separate component procedure codes instead of 1.
-            is_fraud = pid in suspicious_providers and random.random() < 0.35
             if is_fraud:
                 for seq, alt_proc in enumerate(random.sample([p[0] for p in proc_codes], k=3), start=1):
                     proc_rows.append((cid, "outpatient", alt_proc, seq, round(base_amt * random.uniform(0.4, 0.7), 2)))
             else:
-                proc_rows.append((cid, "outpatient", proc_code, 1, pay))
+                proc_rows.append((cid, "outpatient", proc_code, 1, charge))
 
     # --- Carrier (physician/professional) ---
     with open(f"{OUT_DIR}/carrier_claims.csv", "w", newline="") as f:
@@ -258,24 +262,29 @@ def generate_claims(bene_ids, provider_ids, suspicious_providers):
         for i in range(N_CARRIER):
             cid = f"CC{900000+i}"
             bid = random.choice(bene_ids)
-            pid = random.choice(provider_ids)
+            is_duplicate = random.random() < FRAUD_RATE
+            pid = random.choice(suspicious_providers if is_duplicate else provider_ids)
             d = rand_date()
             proc_code, base_amt = random.choice(proc_codes)
             pay = round(base_amt * random.uniform(0.8, 1.05), 2)
             status = random.choices(["Paid", "Denied", "Pending", "Appealed"], weights=[85, 7, 5, 3])[0]
+            if is_duplicate:
+                status = "Paid"
+            if status in ("Denied", "Pending"):
+                pay = 0.0
             w.writerow([cid, bid, pid, d.isoformat(), d.isoformat(), pay, "A", status])
             diag_rows.append((cid, "carrier", random.choice(diag_codes), 1))
-            proc_rows.append((cid, "carrier", proc_code, 1, pay))
+            proc_rows.append((cid, "carrier", proc_code, 1, base_amt))
 
             # Fraud pattern: duplicate billing -- same bene/provider/procedure/date
             # billed twice as separate claim IDs.
             dupe_key = (bid, pid, proc_code, d.isoformat())
-            if pid in suspicious_providers and dupe_key not in seen_dupe_keys and random.random() < 0.15:
+            if is_duplicate and dupe_key not in seen_dupe_keys:
                 seen_dupe_keys.add(dupe_key)
                 dup_cid = f"CC{900000+i}D"
                 w.writerow([dup_cid, bid, pid, d.isoformat(), d.isoformat(), pay, "A", "Paid"])
                 diag_rows.append((dup_cid, "carrier", random.choice(diag_codes), 1))
-                proc_rows.append((dup_cid, "carrier", proc_code, 1, pay))
+                proc_rows.append((dup_cid, "carrier", proc_code, 1, base_amt))
 
     with open(f"{OUT_DIR}/claim_diagnoses.csv", "w", newline="") as f:
         w = csv.writer(f)
