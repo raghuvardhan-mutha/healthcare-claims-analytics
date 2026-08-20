@@ -36,6 +36,18 @@ def test_power_bi_project_has_expected_pages_and_model() -> None:
     assert "Snowflake.Databases" not in model_path.read_text(encoding="utf-8")
     assert "raw.githubusercontent.com" in model_path.read_text(encoding="utf-8")
 
+    pages_root = pages_path.parent
+    for page_name in pages["pageOrder"]:
+        visual_files = sorted((pages_root / page_name / "visuals").glob("*/visual.json"))
+        assert len(visual_files) >= 4, f"Report page {page_name} is not fully populated"
+        visual_types = {
+            json.loads(path.read_text(encoding="utf-8"))["visual"]["visualType"]
+            for path in visual_files
+        }
+        assert "textbox" in visual_types
+        assert "cardVisual" in visual_types
+        assert visual_types & {"lineChart", "clusteredBarChart"}
+
     for table in model["tables"]:
         column_names = {column["name"].casefold() for column in table.get("columns", [])}
         measure_names = {measure["name"].casefold() for measure in table.get("measures", [])}
