@@ -50,6 +50,11 @@ def test_power_bi_project_has_expected_pages_and_model() -> None:
     assert sum(len(table.get("measures", [])) for table in model["tables"]) >= 16
     assert "Snowflake.Databases" not in model_path.read_text(encoding="utf-8")
     assert "raw.githubusercontent.com" in model_path.read_text(encoding="utf-8")
+    assert not any(
+        "M" in measure.get("formatString", "")
+        for table in model["tables"]
+        for measure in table.get("measures", [])
+    ), "Currency measures must not append M because Power BI applies display units"
 
     pages_root = pages_path.parent
     for page_name in pages["pageOrder"]:

@@ -37,7 +37,7 @@
           {
             "name": "Total Paid",
             "expression": "SUM('Monthly Summary'[Paid Amount])",
-            "formatString": "$#,0,,.0M"
+            "formatString": "$#,0"
           },
           {
             "name": "Paid per Claim",
@@ -133,7 +133,7 @@
           {
             "name": "Specialty Total Paid",
             "expression": "SUM('Specialty Financials'[Paid Amount])",
-            "formatString": "$#,0,,.0M"
+            "formatString": "$#,0"
           },
           {
             "name": "Specialty Paid per Claim",
@@ -205,7 +205,7 @@
           {
             "name": "Provider Total Paid",
             "expression": "SUM('Provider Performance'[Paid Amount])",
-            "formatString": "$#,0,,.0M"
+            "formatString": "$#,0"
           },
           {
             "name": "Provider Average Paid",
