@@ -22,13 +22,19 @@ I built this project to practice the type of analysis a healthcare claims team p
 
 ## Power BI Desktop report
 
-The PBIP project opens as a five-page interactive report backed by a documented semantic model. The screenshots below show the refreshed Executive Summary, payment-integrity review, and one-to-many model relationships in Power BI Desktop.
+The PBIP project opens as a five-page interactive report backed by a documented semantic model. The screenshots below show every refreshed report page and the one-to-many model relationships in Power BI Desktop.
 
 ![Power BI Executive Summary](assets/powerbi_executive_summary.png)
 
-| Payment-integrity review | Semantic model relationships |
+| Claims and denials | Financial performance |
 |---|---|
-| ![Power BI Payment Integrity](assets/powerbi_payment_integrity.png) | ![Power BI semantic model](assets/powerbi_semantic_model.png) |
+| ![Power BI Claims and Denials](assets/powerbi_claims_denials.png) | ![Power BI Financial Performance](assets/powerbi_financial_performance.png) |
+
+| Provider performance | Payment-integrity review |
+|---|---|
+| ![Power BI Provider Performance](assets/powerbi_provider_performance.png) | ![Power BI Payment Integrity](assets/powerbi_payment_integrity.png) |
+
+![Power BI semantic model relationships](assets/powerbi_semantic_model.png)
 
 ## Reproducible dashboard previews
 
