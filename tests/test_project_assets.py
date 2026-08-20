@@ -33,6 +33,11 @@ def test_power_bi_project_has_expected_pages_and_model() -> None:
     assert len(claim["measures"]) >= 16
     assert len(model["relationships"]) == 3
 
+    for table in model["tables"]:
+        column_names = {column["name"].casefold() for column in table.get("columns", [])}
+        measure_names = {measure["name"].casefold() for measure in table.get("measures", [])}
+        assert column_names.isdisjoint(measure_names), f"Name collision in {table['name']}"
+
 
 def test_release_documentation_and_deployment_assets_exist() -> None:
     required = [

@@ -106,7 +106,7 @@
           {"name": "Total Billed", "expression": "SUM('Claim'[Billed Amount])", "formatString": "$#,0,,.0M"},
           {"name": "Total Allowed", "expression": "SUM('Claim'[Allowed Amount])", "formatString": "$#,0,,.0M"},
           {"name": "Total Paid", "expression": "SUM('Claim'[Paid Amount])", "formatString": "$#,0,,.0M"},
-          {"name": "Member Responsibility", "expression": "SUM('Claim'[Member Responsibility])", "formatString": "$#,0,,.0M"},
+          {"name": "Total Member Responsibility", "expression": "SUM('Claim'[Member Responsibility])", "formatString": "$#,0,,.0M"},
           {"name": "Denied Claims", "expression": "CALCULATE([Total Claims], 'Claim'[Adjudication Status] = \"Denied\")", "formatString": "#,0"},
           {"name": "Denial Rate", "expression": "DIVIDE([Denied Claims], [Total Claims])", "formatString": "0.0%"},
           {"name": "Appealed Claims", "expression": "CALCULATE([Total Claims], 'Claim'[Appeal Indicator] = TRUE())", "formatString": "#,0"},

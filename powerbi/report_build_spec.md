@@ -6,7 +6,7 @@ Use a 16:9 canvas, the included theme, a persistent `Date[Year]` / `Date[Year Mo
 |---|---|---|
 | Executive Summary | KPI cards, monthly paid trend, status mix, specialty ranking | Total Claims, Total Paid, Denial Rate, Average Adjudication Days, Date[Year Month], Claim[Adjudication Status], Provider[Specialty] |
 | Claims & Denials | Denial-rate trend, denial-reason bars, claim-type matrix, appeal card | Denied Claims, Denial Rate, Appeal Rate, Claim[Denial Reason Code], Claim[Claim Type] |
-| Financial Performance | Billed/allowed/paid trend, payment ratio, member responsibility, specialty table | Total Billed, Total Allowed, Total Paid, Payment Ratio, Member Responsibility, Paid per Claim |
+| Financial Performance | Billed/allowed/paid trend, payment ratio, member responsibility, specialty table | Total Billed, Total Allowed, Total Paid, Payment Ratio, Total Member Responsibility, Paid per Claim |
 | Provider Performance | Provider scatter, specialty benchmark, provider detail table | Total Claims, Total Paid, Denial Rate, Average Adjudication Days, Provider[Provider Name], Provider[Specialty] |
 | Payment Integrity | Review-signal card/trend, injected-pattern bars, prioritized provider table | Review Signal Claims, Review Signal Rate, Claim[Injected Pattern], Provider[Provider Name] |
 
