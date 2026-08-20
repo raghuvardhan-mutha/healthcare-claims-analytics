@@ -9,97 +9,620 @@
       {
         "name": "Monthly Summary",
         "columns": [
-          {"name": "Month", "dataType": "dateTime", "sourceColumn": "month", "formatString": "MMM yyyy"},
-          {"name": "Claims", "dataType": "int64", "sourceColumn": "claims", "formatString": "#,0"},
-          {"name": "Paid Amount", "dataType": "decimal", "sourceColumn": "total_paid", "formatString": "$#,0.00;($#,0.00);$#,0.00"}
+          {
+            "name": "Month",
+            "dataType": "dateTime",
+            "sourceColumn": "month",
+            "formatString": "MMM yyyy"
+          },
+          {
+            "name": "Claims",
+            "dataType": "int64",
+            "sourceColumn": "claims",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Paid Amount",
+            "dataType": "decimal",
+            "sourceColumn": "total_paid",
+            "formatString": "$#,0.00;($#,0.00);$#,0.00"
+          }
         ],
         "measures": [
-          {"name": "Total Claims", "expression": "SUM('Monthly Summary'[Claims])", "formatString": "#,0"},
-          {"name": "Total Paid", "expression": "SUM('Monthly Summary'[Paid Amount])", "formatString": "$#,0,,.0M"},
-          {"name": "Paid per Claim", "expression": "DIVIDE([Total Paid], [Total Claims])", "formatString": "$#,0"}
+          {
+            "name": "Total Claims",
+            "expression": "SUM('Monthly Summary'[Claims])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Total Paid",
+            "expression": "SUM('Monthly Summary'[Paid Amount])",
+            "formatString": "$#,0,,.0M"
+          },
+          {
+            "name": "Paid per Claim",
+            "expression": "DIVIDE([Total Paid], [Total Claims])",
+            "formatString": "$#,0"
+          }
         ],
-        "partitions": [{"name": "Monthly Summary", "mode": "import", "source": {"type": "m", "expression": ["let", "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/executive_summary.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),", "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),", "    Typed = Table.TransformColumnTypes(Headers, {{\"month\", type date}, {\"claims\", Int64.Type}, {\"total_paid\", Currency.Type}})", "in", "    Typed"]}}]
+        "partitions": [
+          {
+            "name": "Monthly Summary",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/executive_summary.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"month\", type date}, {\"claims\", Int64.Type}, {\"total_paid\", Currency.Type}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
       },
       {
         "name": "Claims Status",
         "columns": [
-          {"name": "Claim Status", "dataType": "string", "sourceColumn": "claim_status"},
-          {"name": "Claims", "dataType": "int64", "sourceColumn": "claims", "formatString": "#,0"}
+          {
+            "name": "Claim Status",
+            "dataType": "string",
+            "sourceColumn": "claim_status"
+          },
+          {
+            "name": "Claims",
+            "dataType": "int64",
+            "sourceColumn": "claims",
+            "formatString": "#,0"
+          }
         ],
         "measures": [
-          {"name": "Status Claims", "expression": "SUM('Claims Status'[Claims])", "formatString": "#,0"}
+          {
+            "name": "Status Claims",
+            "expression": "SUM('Claims Status'[Claims])",
+            "formatString": "#,0"
+          }
         ],
-        "partitions": [{"name": "Claims Status", "mode": "import", "source": {"type": "m", "expression": ["let", "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/claims_by_status.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),", "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),", "    Typed = Table.TransformColumnTypes(Headers, {{\"claim_status\", type text}, {\"claims\", Int64.Type}})", "in", "    Typed"]}}]
+        "partitions": [
+          {
+            "name": "Claims Status",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/claims_by_status.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"claim_status\", type text}, {\"claims\", Int64.Type}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
       },
       {
         "name": "Specialty Financials",
         "columns": [
-          {"name": "Specialty", "dataType": "string", "sourceColumn": "specialty"},
-          {"name": "Claims", "dataType": "int64", "sourceColumn": "claims", "formatString": "#,0"},
-          {"name": "Paid Amount", "dataType": "decimal", "sourceColumn": "total_paid", "formatString": "$#,0.00;($#,0.00);$#,0.00"}
+          {
+            "name": "Specialty",
+            "dataType": "string",
+            "sourceColumn": "specialty"
+          },
+          {
+            "name": "Claims",
+            "dataType": "int64",
+            "sourceColumn": "claims",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Paid Amount",
+            "dataType": "decimal",
+            "sourceColumn": "total_paid",
+            "formatString": "$#,0.00;($#,0.00);$#,0.00"
+          }
         ],
         "measures": [
-          {"name": "Specialty Claims", "expression": "SUM('Specialty Financials'[Claims])", "formatString": "#,0"},
-          {"name": "Specialty Total Paid", "expression": "SUM('Specialty Financials'[Paid Amount])", "formatString": "$#,0,,.0M"},
-          {"name": "Specialty Paid per Claim", "expression": "DIVIDE([Specialty Total Paid], [Specialty Claims])", "formatString": "$#,0"}
+          {
+            "name": "Specialty Claims",
+            "expression": "SUM('Specialty Financials'[Claims])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Specialty Total Paid",
+            "expression": "SUM('Specialty Financials'[Paid Amount])",
+            "formatString": "$#,0,,.0M"
+          },
+          {
+            "name": "Specialty Paid per Claim",
+            "expression": "DIVIDE([Specialty Total Paid], [Specialty Claims])",
+            "formatString": "$#,0"
+          }
         ],
-        "partitions": [{"name": "Specialty Financials", "mode": "import", "source": {"type": "m", "expression": ["let", "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/financial_by_specialty.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),", "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),", "    Typed = Table.TransformColumnTypes(Headers, {{\"specialty\", type text}, {\"claims\", Int64.Type}, {\"total_paid\", Currency.Type}})", "in", "    Typed"]}}]
+        "partitions": [
+          {
+            "name": "Specialty Financials",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/financial_by_specialty.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"specialty\", type text}, {\"claims\", Int64.Type}, {\"total_paid\", Currency.Type}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
       },
       {
         "name": "Provider Performance",
         "columns": [
-          {"name": "Provider ID", "dataType": "string", "sourceColumn": "provider_id"},
-          {"name": "Provider Name", "dataType": "string", "sourceColumn": "provider_name"},
-          {"name": "Specialty", "dataType": "string", "sourceColumn": "specialty"},
-          {"name": "Claims", "dataType": "int64", "sourceColumn": "claims", "formatString": "#,0"},
-          {"name": "Paid Amount", "dataType": "decimal", "sourceColumn": "total_paid", "formatString": "$#,0.00;($#,0.00);$#,0.00"},
-          {"name": "Average Paid", "dataType": "decimal", "sourceColumn": "avg_paid", "formatString": "$#,0.00"}
+          {
+            "name": "Provider ID",
+            "dataType": "string",
+            "sourceColumn": "provider_id"
+          },
+          {
+            "name": "Provider Name",
+            "dataType": "string",
+            "sourceColumn": "provider_name"
+          },
+          {
+            "name": "Specialty",
+            "dataType": "string",
+            "sourceColumn": "specialty"
+          },
+          {
+            "name": "Claims",
+            "dataType": "int64",
+            "sourceColumn": "claims",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Paid Amount",
+            "dataType": "decimal",
+            "sourceColumn": "total_paid",
+            "formatString": "$#,0.00;($#,0.00);$#,0.00"
+          },
+          {
+            "name": "Average Paid",
+            "dataType": "decimal",
+            "sourceColumn": "avg_paid",
+            "formatString": "$#,0.00"
+          }
         ],
         "measures": [
-          {"name": "Provider Claims", "expression": "SUM('Provider Performance'[Claims])", "formatString": "#,0"},
-          {"name": "Provider Total Paid", "expression": "SUM('Provider Performance'[Paid Amount])", "formatString": "$#,0,,.0M"},
-          {"name": "Provider Average Paid", "expression": "DIVIDE([Provider Total Paid], [Provider Claims])", "formatString": "$#,0"}
+          {
+            "name": "Provider Claims",
+            "expression": "SUM('Provider Performance'[Claims])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Provider Total Paid",
+            "expression": "SUM('Provider Performance'[Paid Amount])",
+            "formatString": "$#,0,,.0M"
+          },
+          {
+            "name": "Provider Average Paid",
+            "expression": "DIVIDE([Provider Total Paid], [Provider Claims])",
+            "formatString": "$#,0"
+          }
         ],
-        "partitions": [{"name": "Provider Performance", "mode": "import", "source": {"type": "m", "expression": ["let", "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/provider_performance.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),", "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),", "    Typed = Table.TransformColumnTypes(Headers, {{\"provider_id\", type text}, {\"provider_name\", type text}, {\"specialty\", type text}, {\"claims\", Int64.Type}, {\"total_paid\", Currency.Type}, {\"avg_paid\", Currency.Type}})", "in", "    Typed"]}}]
+        "partitions": [
+          {
+            "name": "Provider Performance",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/provider_performance.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"provider_id\", type text}, {\"provider_name\", type text}, {\"specialty\", type text}, {\"claims\", Int64.Type}, {\"total_paid\", Currency.Type}, {\"avg_paid\", Currency.Type}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
       },
       {
         "name": "Chronic Conditions",
         "columns": [
-          {"name": "Condition", "dataType": "string", "sourceColumn": "condition_name"},
-          {"name": "Beneficiaries Affected", "dataType": "int64", "sourceColumn": "beneficiaries_affected", "formatString": "#,0"},
-          {"name": "Prevalence Pct", "dataType": "decimal", "sourceColumn": "prevalence_pct", "formatString": "0.00"}
+          {
+            "name": "Condition",
+            "dataType": "string",
+            "sourceColumn": "condition_name"
+          },
+          {
+            "name": "Beneficiaries Affected",
+            "dataType": "int64",
+            "sourceColumn": "beneficiaries_affected",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Prevalence Pct",
+            "dataType": "decimal",
+            "sourceColumn": "prevalence_pct",
+            "formatString": "0.00"
+          }
         ],
         "measures": [
-          {"name": "Total Beneficiaries Affected", "expression": "SUM('Chronic Conditions'[Beneficiaries Affected])", "formatString": "#,0"},
-          {"name": "Average Prevalence Pct", "expression": "AVERAGE('Chronic Conditions'[Prevalence Pct])", "formatString": "0.00"}
+          {
+            "name": "Total Beneficiaries Affected",
+            "expression": "SUM('Chronic Conditions'[Beneficiaries Affected])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Average Prevalence Pct",
+            "expression": "AVERAGE('Chronic Conditions'[Prevalence Pct])",
+            "formatString": "0.00"
+          }
         ],
-        "partitions": [{"name": "Chronic Conditions", "mode": "import", "source": {"type": "m", "expression": ["let", "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/patient_chronic_conditions.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),", "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),", "    Typed = Table.TransformColumnTypes(Headers, {{\"condition_name\", type text}, {\"beneficiaries_affected\", Int64.Type}, {\"prevalence_pct\", type number}})", "in", "    Typed"]}}]
+        "partitions": [
+          {
+            "name": "Chronic Conditions",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/patient_chronic_conditions.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"condition_name\", type text}, {\"beneficiaries_affected\", Int64.Type}, {\"prevalence_pct\", type number}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
       },
       {
         "name": "Payment Integrity",
         "columns": [
-          {"name": "Provider ID", "dataType": "string", "sourceColumn": "provider_id"},
-          {"name": "Provider Name", "dataType": "string", "sourceColumn": "provider_name"},
-          {"name": "Specialty", "dataType": "string", "sourceColumn": "specialty"},
-          {"name": "Average Lines per Claim", "dataType": "decimal", "sourceColumn": "avg_line_items_per_claim", "formatString": "0.00"},
-          {"name": "Potential Unbundled Claims", "dataType": "int64", "sourceColumn": "unbundled_claims", "formatString": "#,0"},
-          {"name": "Potential Duplicate Groups", "dataType": "int64", "sourceColumn": "duplicate_groups", "formatString": "#,0"},
-          {"name": "Cost vs Peer Ratio", "dataType": "decimal", "sourceColumn": "cost_vs_peer_ratio", "formatString": "0.00"},
-          {"name": "Composite Risk Score", "dataType": "decimal", "sourceColumn": "composite_risk_score", "formatString": "0.00"}
+          {
+            "name": "Provider ID",
+            "dataType": "string",
+            "sourceColumn": "provider_id"
+          },
+          {
+            "name": "Provider Name",
+            "dataType": "string",
+            "sourceColumn": "provider_name"
+          },
+          {
+            "name": "Specialty",
+            "dataType": "string",
+            "sourceColumn": "specialty"
+          },
+          {
+            "name": "Average Lines per Claim",
+            "dataType": "decimal",
+            "sourceColumn": "avg_line_items_per_claim",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Potential Unbundled Claims",
+            "dataType": "int64",
+            "sourceColumn": "unbundled_claims",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Potential Duplicate Groups",
+            "dataType": "int64",
+            "sourceColumn": "duplicate_groups",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Cost vs Peer Ratio",
+            "dataType": "decimal",
+            "sourceColumn": "cost_vs_peer_ratio",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Composite Risk Score",
+            "dataType": "decimal",
+            "sourceColumn": "composite_risk_score",
+            "formatString": "0.00"
+          }
         ],
         "measures": [
-          {"name": "Review Providers", "expression": "COUNTROWS('Payment Integrity')", "formatString": "#,0"},
-          {"name": "Total Potential Unbundled Claims", "expression": "SUM('Payment Integrity'[Potential Unbundled Claims])", "formatString": "#,0"},
-          {"name": "Total Potential Duplicate Groups", "expression": "SUM('Payment Integrity'[Potential Duplicate Groups])", "formatString": "#,0"},
-          {"name": "Average Cost vs Peer", "expression": "AVERAGE('Payment Integrity'[Cost vs Peer Ratio])", "formatString": "0.00"},
-          {"name": "Average Risk Score", "expression": "AVERAGE('Payment Integrity'[Composite Risk Score])", "formatString": "0.00"}
+          {
+            "name": "Review Providers",
+            "expression": "COUNTROWS('Payment Integrity')",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Total Potential Unbundled Claims",
+            "expression": "SUM('Payment Integrity'[Potential Unbundled Claims])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Total Potential Duplicate Groups",
+            "expression": "SUM('Payment Integrity'[Potential Duplicate Groups])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Average Cost vs Peer",
+            "expression": "AVERAGE('Payment Integrity'[Cost vs Peer Ratio])",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Average Risk Score",
+            "expression": "AVERAGE('Payment Integrity'[Composite Risk Score])",
+            "formatString": "0.00"
+          }
         ],
-        "partitions": [{"name": "Payment Integrity", "mode": "import", "source": {"type": "m", "expression": ["let", "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/fraud_risk_providers.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),", "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),", "    Typed = Table.TransformColumnTypes(Headers, {{\"provider_id\", type text}, {\"provider_name\", type text}, {\"specialty\", type text}, {\"avg_line_items_per_claim\", type number}, {\"unbundled_claims\", Int64.Type}, {\"duplicate_groups\", Int64.Type}, {\"cost_vs_peer_ratio\", type number}, {\"composite_risk_score\", type number}})", "in", "    Typed"]}}]
+        "partitions": [
+          {
+            "name": "Payment Integrity",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/fraud_risk_providers.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"provider_id\", type text}, {\"provider_name\", type text}, {\"specialty\", type text}, {\"avg_line_items_per_claim\", type number}, {\"unbundled_claims\", Int64.Type}, {\"duplicate_groups\", Int64.Type}, {\"cost_vs_peer_ratio\", type number}, {\"composite_risk_score\", type number}})",
+                "in",
+                "    Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Dim Date",
+        "columns": [
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "sourceColumn": "Date",
+            "formatString": "MMM yyyy"
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year",
+            "formatString": "0"
+          },
+          {
+            "name": "Month Name",
+            "dataType": "string",
+            "sourceColumn": "Month Name",
+            "sortByColumn": "Month Number"
+          },
+          {
+            "name": "Month Number",
+            "dataType": "int64",
+            "sourceColumn": "Month Number",
+            "formatString": "0"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Dim Date",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/executive_summary.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"month\", type date}}),",
+                "    Selected = Table.SelectColumns(Typed, {\"month\"}),",
+                "    Renamed = Table.RenameColumns(Selected, {{\"month\", \"Date\"}}),",
+                "    DistinctRows = Table.Distinct(Renamed),",
+                "    AddYear = Table.AddColumn(DistinctRows, \"Year\", each Date.Year([Date]), Int64.Type),",
+                "    AddMonthName = Table.AddColumn(AddYear, \"Month Name\", each Date.ToText([Date], \"MMM\"), type text),",
+                "    AddMonthNumber = Table.AddColumn(AddMonthName, \"Month Number\", each Date.Month([Date]), Int64.Type),",
+                "    Sorted = Table.Sort(AddMonthNumber, {{\"Date\", Order.Ascending}})",
+                "in",
+                "    Sorted"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Dim Provider",
+        "columns": [
+          {
+            "name": "Provider ID",
+            "dataType": "string",
+            "sourceColumn": "provider_id"
+          },
+          {
+            "name": "Provider Name",
+            "dataType": "string",
+            "sourceColumn": "provider_name"
+          },
+          {
+            "name": "Specialty",
+            "dataType": "string",
+            "sourceColumn": "specialty"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Dim Provider",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/provider_performance.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"provider_id\", type text}, {\"provider_name\", type text}, {\"specialty\", type text}}),",
+                "    Selected = Table.SelectColumns(Typed, {\"provider_id\", \"provider_name\", \"specialty\"}),",
+                "    DistinctRows = Table.Distinct(Selected, {\"provider_id\"})",
+                "in",
+                "    DistinctRows"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Dim Specialty",
+        "columns": [
+          {
+            "name": "Specialty",
+            "dataType": "string",
+            "sourceColumn": "specialty"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Dim Specialty",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/financial_by_specialty.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"specialty\", type text}}),",
+                "    Selected = Table.SelectColumns(Typed, {\"specialty\"}),",
+                "    DistinctRows = Table.Distinct(Selected)",
+                "in",
+                "    DistinctRows"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Dim Claim Status",
+        "columns": [
+          {
+            "name": "Claim Status",
+            "dataType": "string",
+            "sourceColumn": "claim_status"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Dim Claim Status",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/claims_by_status.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"claim_status\", type text}}),",
+                "    Selected = Table.SelectColumns(Typed, {\"claim_status\"}),",
+                "    DistinctRows = Table.Distinct(Selected)",
+                "in",
+                "    DistinctRows"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Dim Condition",
+        "columns": [
+          {
+            "name": "Condition",
+            "dataType": "string",
+            "sourceColumn": "condition_name"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Dim Condition",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = Csv.Document(Web.Contents(\"https://raw.githubusercontent.com/raghuvardhan-mutha/healthcare-claims-analytics/main/dashboards/data_marts/patient_chronic_conditions.csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+                "    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    Typed = Table.TransformColumnTypes(Headers, {{\"condition_name\", type text}}),",
+                "    Selected = Table.SelectColumns(Typed, {\"condition_name\"}),",
+                "    DistinctRows = Table.Distinct(Selected)",
+                "in",
+                "    DistinctRows"
+              ]
+            }
+          }
+        ]
       }
     ],
     "annotations": [
-      {"name": "PBI_QueryOrder", "value": "[\"Monthly Summary\",\"Claims Status\",\"Specialty Financials\",\"Provider Performance\",\"Chronic Conditions\",\"Payment Integrity\"]"},
-      {"name": "PBI_ProTooling", "value": "[\"DevMode\"]"}
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"Monthly Summary\",\"Claims Status\",\"Specialty Financials\",\"Provider Performance\",\"Chronic Conditions\",\"Payment Integrity\",\"Dim Date\",\"Dim Provider\",\"Dim Specialty\",\"Dim Claim Status\",\"Dim Condition\"]"
+      },
+      {
+        "name": "PBI_ProTooling",
+        "value": "[\"DevMode\"]"
+      }
+    ],
+    "relationships": [
+      {
+        "name": "b7f51043-3c8d-4bfa-8bc3-97a9047f9411",
+        "fromTable": "Monthly Summary",
+        "fromColumn": "Month",
+        "toTable": "Dim Date",
+        "toColumn": "Date"
+      },
+      {
+        "name": "8173ce8f-c1d5-46af-b4f1-348570aba81c",
+        "fromTable": "Claims Status",
+        "fromColumn": "Claim Status",
+        "toTable": "Dim Claim Status",
+        "toColumn": "Claim Status"
+      },
+      {
+        "name": "9d823370-d640-454c-b822-8aeb0f47cb1b",
+        "fromTable": "Specialty Financials",
+        "fromColumn": "Specialty",
+        "toTable": "Dim Specialty",
+        "toColumn": "Specialty"
+      },
+      {
+        "name": "a82bfa59-41a0-4dbb-9f95-189c465094e2",
+        "fromTable": "Provider Performance",
+        "fromColumn": "Provider ID",
+        "toTable": "Dim Provider",
+        "toColumn": "Provider ID"
+      },
+      {
+        "name": "2279c41e-08c9-4bc0-b71f-cab62f2d4aae",
+        "fromTable": "Provider Performance",
+        "fromColumn": "Specialty",
+        "toTable": "Dim Specialty",
+        "toColumn": "Specialty"
+      },
+      {
+        "name": "04d31142-d0dc-43f7-9a56-a78724c47c1b",
+        "fromTable": "Payment Integrity",
+        "fromColumn": "Provider ID",
+        "toTable": "Dim Provider",
+        "toColumn": "Provider ID"
+      },
+      {
+        "name": "9232b4fc-15b6-4944-b8f6-afacbc8d6ad4",
+        "fromTable": "Payment Integrity",
+        "fromColumn": "Specialty",
+        "toTable": "Dim Specialty",
+        "toColumn": "Specialty"
+      },
+      {
+        "name": "63ab4794-502a-407f-834f-0de7bb584e81",
+        "fromTable": "Chronic Conditions",
+        "fromColumn": "Condition",
+        "toTable": "Dim Condition",
+        "toColumn": "Condition"
+      }
     ]
   }
 }

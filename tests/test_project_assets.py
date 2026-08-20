@@ -28,10 +28,25 @@ def test_power_bi_project_has_expected_pages_and_model() -> None:
     )
     assert len(pages["pageOrder"]) == 5
     assert pages["activePageName"] in pages["pageOrder"]
-    assert {table["name"] for table in model["tables"]} == {
+    table_names = {table["name"] for table in model["tables"]}
+    assert table_names == {
         "Monthly Summary", "Claims Status", "Specialty Financials",
         "Provider Performance", "Chronic Conditions", "Payment Integrity",
+        "Dim Date", "Dim Provider", "Dim Specialty", "Dim Claim Status",
+        "Dim Condition",
     }
+    assert len(model["relationships"]) == 8
+    tables_by_name = {table["name"]: table for table in model["tables"]}
+    for relationship in model["relationships"]:
+        from_columns = {
+            column["name"] for column in tables_by_name[relationship["fromTable"]]["columns"]
+        }
+        to_columns = {
+            column["name"] for column in tables_by_name[relationship["toTable"]]["columns"]
+        }
+        assert relationship["fromColumn"] in from_columns
+        assert relationship["toColumn"] in to_columns
+        assert relationship["toTable"].startswith("Dim ")
     assert sum(len(table.get("measures", [])) for table in model["tables"]) >= 16
     assert "Snowflake.Databases" not in model_path.read_text(encoding="utf-8")
     assert "raw.githubusercontent.com" in model_path.read_text(encoding="utf-8")
