@@ -20,7 +20,17 @@ I built this project to practice the type of analysis a healthcare claims team p
 - Where do duplicate, procedure-line, or readmission patterns warrant review?
 - Can the same results be regenerated and checked automatically?
 
-## Dashboard preview
+## Power BI Desktop report
+
+The PBIP project opens as a five-page interactive report backed by a documented semantic model. The screenshots below show the refreshed Executive Summary, payment-integrity review, and one-to-many model relationships in Power BI Desktop.
+
+![Power BI Executive Summary](assets/powerbi_executive_summary.png)
+
+| Payment-integrity review | Semantic model relationships |
+|---|---|
+| ![Power BI Payment Integrity](assets/powerbi_payment_integrity.png) | ![Power BI semantic model](assets/powerbi_semantic_model.png) |
+
+## Reproducible dashboard previews
 
 | Executive summary | Claims and denials |
 |---|---|
@@ -34,7 +44,7 @@ I built this project to practice the type of analysis a healthcare claims team p
 |---|---|
 | ![Chronic-condition prevalence](dashboards/05_patient_chronic_conditions.png) | ![Payment-integrity signals](dashboards/06_fraud_risk.png) |
 
-The charts above are generated from the same data marts used by the BI layer. The `powerbi/` folder contains the version-controlled semantic model, DAX measures, five report-page definitions, theme, and a visual build specification for Power BI Desktop.
+The charts above are generated from the same data marts used by the BI layer. The `powerbi/` folder contains the version-controlled 11-table semantic model, eight relationships, DAX measures, five populated report pages, theme, and a visual build specification for Power BI Desktop.
 
 ## What the project includes
 
