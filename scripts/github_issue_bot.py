@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 import urllib.request
 from pathlib import Path
@@ -21,6 +22,19 @@ def load_event() -> dict:
 def is_ai_question(issue: dict) -> bool:
     labels = {item.get("name", "").lower() for item in issue.get("labels", [])}
     return "ai-question" in labels or issue.get("title", "").lower().startswith("[ai question]")
+
+
+def extract_question(issue: dict) -> str:
+    """Return the question entered in the issue template's analytics section."""
+    body = issue.get("body") or ""
+    match = re.search(
+        r"^###\s+Analytics question\s*\n+(.*?)(?=^###\s+|\Z)",
+        body,
+        flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
+    )
+    if match and match.group(1).strip():
+        return match.group(1).strip()
+    return f"{issue.get('title', '')}\n\n{body}".strip()
 
 
 def post_comment(repository: str, issue_number: int, body: str) -> None:
@@ -74,7 +88,7 @@ def main() -> int:
         return 0
 
     repository = os.environ["GITHUB_REPOSITORY"]
-    question = f"{issue.get('title', '')}\n\n{issue.get('body') or ''}".strip()
+    question = extract_question(issue)
     try:
         result = ClaimsAssistant().ask(question)
         comment = format_comment(result)

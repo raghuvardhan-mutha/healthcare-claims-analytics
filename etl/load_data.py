@@ -157,13 +157,14 @@ def run_validation(conn):
 
 
 if __name__ == "__main__":
-    # A previous interrupted SQLite write can leave recovery sidecars behind.
-    # Remove the database and only its explicitly named sidecars before a clean
-    # rebuild so an obsolete journal can never be replayed into the new file.
-    for database_file in (DB_FILE, f"{DB_FILE}-journal", f"{DB_FILE}-wal", f"{DB_FILE}-shm"):
+    # Build a complete database beside the published file and replace it only
+    # after SQLite has committed and closed it. This keeps repeated pipeline
+    # runs from exposing a partially rebuilt database to another process.
+    build_file = f"{DB_FILE}.building"
+    for database_file in (build_file, f"{build_file}-journal", f"{build_file}-wal", f"{build_file}-shm"):
         if os.path.exists(database_file):
             os.remove(database_file)
-    conn = sqlite3.connect(DB_FILE)
+    conn = sqlite3.connect(build_file)
     conn.execute("PRAGMA foreign_keys = ON")
     print(f"Building schema from {SCHEMA_FILE} ...")
     build_schema(conn)
@@ -174,4 +175,11 @@ if __name__ == "__main__":
     print("\nRunning source-to-target validation...\n")
     run_validation(conn)
     conn.close()
+    for sidecar in (f"{build_file}-journal", f"{build_file}-wal", f"{build_file}-shm"):
+        if os.path.exists(sidecar):
+            os.remove(sidecar)
+    for sidecar in (f"{DB_FILE}-journal", f"{DB_FILE}-wal", f"{DB_FILE}-shm"):
+        if os.path.exists(sidecar):
+            os.remove(sidecar)
+    os.replace(build_file, DB_FILE)
     print(f"\nDatabase ready at: {DB_FILE}")
