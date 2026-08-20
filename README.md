@@ -6,23 +6,52 @@
 
 ![Healthcare Claims Analytics](assets/healthcare-claims-banner.svg)
 
-I built this project to practice the type of analysis a healthcare claims team performs every day: monitoring denials, reconciling payments, comparing providers, and identifying claims that may need additional review. The project starts with synthetic claims files and produces a validated warehouse, reusable SQL analysis, dashboard-ready datasets, and reproducible report previews.
+An end-to-end portfolio project that turns raw healthcare claims into validated data, reusable SQL analysis, and a five-page Power BI report. I built it around questions a claims analytics team regularly needs to answer: What is driving paid amount? Where are denials concentrated? Which providers differ from their peers? Which payment patterns deserve a closer review?
 
-**Dataset:** 40,514 claims · 5,000 beneficiaries · 400 providers · 14 normalized tables · 2021–2023
+**Dataset:** 40,514 synthetic claims · 5,000 beneficiaries · 400 providers · 2021–2023  
+**Tools:** SQL · Python · Power BI · SQLite · Snowflake-ready dimensional modeling · pytest · GitHub Actions
 
-> All names, claims, and results are synthetic. The payment-integrity rules identify records for review; they do not establish fraud or support clinical decisions.
+> This project uses synthetic data only. Payment-integrity indicators are prioritization signals, not findings of fraud, and the report is not intended for clinical decision-making.
 
-## What I wanted to answer
+## Executive summary
 
-- How are claim volume, paid amount, and denial rate changing over time?
-- Which specialties and providers have unusually high denial or payment patterns?
-- Do billed, allowed, and paid amounts reconcile correctly?
-- Where do duplicate, procedure-line, or readmission patterns warrant review?
-- Can the same results be regenerated and checked automatically?
+The project begins with generated claims files and ends with a tested analytical model and interactive report. Python handles generation, loading, validation, and exports. SQL contains the business logic. SQLite provides a fully reproducible local warehouse, while the Snowflake folder demonstrates how the dimensional model can be deployed in an enterprise environment. Power BI consumes six reporting marts produced by the same pipeline.
 
-## Power BI Desktop report
+### What I built
 
-The PBIP project opens as a five-page interactive report backed by a documented semantic model. The screenshots below show every refreshed report page and the one-to-many model relationships in Power BI Desktop.
+- A normalized 14-table claims warehouse covering beneficiaries, providers, claims, diagnoses, procedures, pharmacy events, and adjudication
+- More than 30 reusable SQL analyses for claims operations, finance, provider performance, utilization, and payment integrity
+- Six dashboard-ready marts and a Power BI project with 11 model tables, eight active relationships, DAX measures, and five report pages
+- Automated checks for row counts, keys, dates, claim statuses, and financial rules
+- A one-command pipeline and GitHub Actions workflow that rebuild and test the project
+- An optional read-only analytics assistant with four built-in questions that work without an API key
+
+### Main results from the demo data
+
+| Metric | Result | How to interpret it |
+|---|---:|---|
+| Total claims | 40,514 | Claims generated across the 2021–2023 period |
+| Total paid | $118.5M | Sum of paid amount after validation |
+| Denial rate | 7.7% | Share of claims with a denied adjudication status |
+| Procedure-line review signals | 237 | Records prioritized for additional review |
+| Potential duplicate groups | 514 | Groups with duplicate-like attributes |
+| 30-day readmission signals | 47 | Synthetic inpatient patterns within 30 days |
+
+These results demonstrate the analytical method; they are not benchmarks for a real payer or provider organization.
+
+## Business questions
+
+I designed the analysis around five practical questions:
+
+1. How are claim volume, paid amount, and denial rate changing over time?
+2. Which specialties and providers have unusual denial or payment patterns?
+3. Do billed, allowed, and paid amounts reconcile correctly?
+4. Where do duplicate, procedure-line, or readmission patterns warrant review?
+5. Can every reported result be regenerated and checked automatically?
+
+## Dashboard gallery
+
+The Power BI project opens as a five-page interactive report. The pages below were refreshed and reviewed in Power BI Desktop.
 
 ![Power BI Executive Summary](assets/powerbi_executive_summary.png)
 
@@ -34,67 +63,53 @@ The PBIP project opens as a five-page interactive report backed by a documented 
 |---|---|
 | ![Power BI Provider Performance](assets/powerbi_provider_performance.png) | ![Power BI Payment Integrity](assets/powerbi_payment_integrity.png) |
 
+The semantic model uses one-to-many relationships so filters behave consistently across the report:
+
 ![Power BI semantic model relationships](assets/powerbi_semantic_model.png)
 
-The report uses the same reproducible data marts generated by the pipeline. The `powerbi/` folder contains the version-controlled 11-table semantic model, eight relationships, DAX measures, five populated report pages, theme, and a visual build specification for Power BI Desktop.
-
-## What the project includes
-
-| Component | Implementation |
-|---|---|
-| Data generation | Deterministic Python generator with demo, medium, and large scale profiles |
-| Local warehouse | SQLite implementation with 14 normalized claims tables |
-| Analytics model | Date, member, provider, and claim dimensions/facts plus bridge exports |
-| SQL analysis | 30+ queries covering operations, finance, providers, members, and payment integrity |
-| BI outputs | Six CSV data marts, six generated previews, and Power BI project source |
-| Snowflake path | Star-schema DDL, staged-load SQL, exports, and data-quality checks |
-| Validation | Source-to-target counts, key checks, financial rules, pytest, and GitHub Actions |
-| Optional assistant | Four no-key example questions plus guarded free-form queries when an API key is configured |
-
-## How the data flows
+## How the project works
 
 ```mermaid
 flowchart TD
-    A["Synthetic claims CSVs"] --> B["Python ETL"]
-    B --> C[("Validated SQLite warehouse")]
-    C --> D["SQL analysis"]
+    A["Synthetic claims files"] --> B["Python ETL and validation"]
+    B --> C[("SQLite warehouse")]
+    C --> D["Reusable SQL analysis"]
     C --> E["Dimensional model"]
     E --> F["Snowflake-ready exports"]
-    E --> G["BI data marts and previews"]
+    E --> G["Power BI marts and report"]
 ```
 
-The local pipeline is the reproducible reference implementation. Snowflake scripts and the Power BI semantic model show how I would move the same measures into an enterprise BI environment without changing their definitions.
-
-## Reproducible results
-
-The generator uses a fixed seed, so a clean run produces the same benchmark results.
-
-| Metric | Demo result |
-|---|---:|
-| Total claims | 40,514 |
-| Total paid amount | $118.5M |
-| Denial rate | 7.7% |
-| Potential procedure-line review signals | 237 |
-| Potential duplicate groups | 514 |
-| 30-day readmission signals | 47 |
-
-These values describe the synthetic demo data only. In a real claims environment, every flagged pattern would require validation against coding rules, contracts, policies, and supporting records.
+I chose SQLite for the reference implementation so reviewers can run the complete workflow without cloud credentials. The Snowflake scripts are a separate deployment path; they are included to show the warehouse design, staged loading, and quality checks without claiming that this repository is connected to a live Snowflake account.
 
 ## Data model
 
-The normalized layer separates members, providers, code reference data, claims, claim lines, and adjudication events:
+The normalized warehouse separates each business subject instead of storing everything in one wide file:
 
-- Members: `beneficiaries`, `chronic_conditions`
-- Providers: `providers`
-- Claims: `inpatient_claims`, `outpatient_claims`, `carrier_claims`
-- Pharmacy: `prescription_drug_events`
-- Reference data: `diagnosis_codes`, `procedure_codes`, `drug_codes`
-- Claim detail: `claim_diagnoses`, `claim_procedures`, `claim_adjudication`
-- Validation labels: `claim_integrity_labels`
+- **Members:** `beneficiaries`, `chronic_conditions`
+- **Providers:** `providers`
+- **Claims:** `inpatient_claims`, `outpatient_claims`, `carrier_claims`
+- **Pharmacy:** `prescription_drug_events`
+- **Reference data:** `diagnosis_codes`, `procedure_codes`, `drug_codes`
+- **Claim detail:** `claim_diagnoses`, `claim_procedures`, `claim_adjudication`
+- **Validation labels:** `claim_integrity_labels`
 
-The dimensional layer reorganizes this data for Snowflake and Power BI. See the [data dictionary](docs/data_dictionary.md) and [Snowflake design](docs/snowflake_architecture.md).
+The reporting layer reshapes this data for analysis and Power BI. Field definitions are documented in the [data dictionary](docs/data_dictionary.md), and KPI formulas are listed in the [KPI catalog](docs/kpi_catalog.md).
 
-## Run it locally
+## Quality checks
+
+The pipeline checks more than whether the code runs. It validates:
+
+- Source-to-target row counts
+- Required tables, columns, and dimensional-model structure
+- Orphaned keys and invalid claim statuses
+- Date chronology and nonnegative financial amounts
+- The rule `paid amount <= allowed amount <= billed amount`
+- Power BI pages, measures, JSON structure, and relationships
+- Read-only SQL enforcement for the optional assistant
+
+The verified project run passed all 22 automated tests. GitHub Actions repeats the build and test suite on every push and pull request.
+
+## Run the project locally
 
 ### Requirements
 
@@ -111,15 +126,17 @@ python -m venv .venv
 
 Activate the environment:
 
-```bash
+```powershell
 # Windows PowerShell
 .venv\Scripts\Activate.ps1
+```
 
+```bash
 # macOS or Linux
 source .venv/bin/activate
 ```
 
-Install and run:
+Install the dependencies, rebuild the project, and run the tests:
 
 ```bash
 python -m pip install --upgrade pip
@@ -128,20 +145,24 @@ python run_pipeline.py
 python -m pytest -q
 ```
 
-`run_pipeline.py` regenerates the data, rebuilds the warehouse, validates it, exports the dimensional model, refreshes the data marts, and recreates the dashboard images.
+`run_pipeline.py` regenerates the synthetic files, rebuilds the warehouse, runs validation, exports the dimensional model, refreshes the reporting marts, and recreates the generated dashboard previews.
 
-## Snowflake and Power BI
+## Open the Power BI report
 
-The two review paths are intentionally separate:
+1. Install Power BI Desktop on Windows.
+2. Open [`powerbi/HealthcareClaimsAnalytics.pbip`](powerbi/HealthcareClaimsAnalytics.pbip).
+3. If Power BI asks for credentials for the public GitHub data source, choose **Anonymous** and set the privacy level to **Public**.
+4. Select **Refresh** and confirm that all five pages load.
 
-- **Power BI demo:** Open [`powerbi/HealthcareClaimsAnalytics.pbip`](powerbi/HealthcareClaimsAnalytics.pbip) in Power BI Desktop. It loads the six public synthetic data marts from this repository and does not require a Snowflake account. If prompted for the public GitHub data source, select **Anonymous** and **Public**.
-- **Snowflake deployment:** Follow [`snowflake/README.md`](snowflake/README.md) to create and load the dimensional model, then run `snowflake/03_quality_checks.sql`.
+The checked-in report uses public synthetic marts and does not require a Snowflake account. The repository validates the project structure in CI; final visual rendering is reviewed in Power BI Desktop because Desktop is not available on the Linux CI runner.
 
-The repository validates the Power BI JSON and model structure in CI. Final visual rendering is reviewed in Power BI Desktop because Desktop is unavailable on the Linux CI runner.
+## Snowflake deployment path
+
+The local SQLite build is the tested reference implementation. To deploy the dimensional model in Snowflake, follow [`snowflake/README.md`](snowflake/README.md), then run `snowflake/03_quality_checks.sql` after loading the exports.
 
 ## Optional analytics assistant
 
-The Streamlit interface is an additional demonstration, not a dependency of the ETL or dashboards.
+The Streamlit assistant is an additional interface, not a requirement for the ETL or Power BI report.
 
 ```bash
 streamlit run streamlit_app.py
@@ -154,45 +175,38 @@ These built-in questions work without an API key:
 - `Show the monthly paid-amount trend.`
 - `Which chronic conditions are most common?`
 
-Free-form questions require `OPENAI_API_KEY`. Generated SQL is restricted to one read-only `SELECT`, validated against approved tables and columns, limited to 200 rows, and shown with the answer. See the [assistant design notes](docs/ai_architecture.md).
-
-## Validation and testing
-
-The automated checks cover:
-
-- Source CSV and warehouse row-count reconciliation
-- Required table and dimensional-model structure
-- Orphaned keys and invalid claim statuses
-- Date chronology and nonnegative amounts
-- The rule `paid amount ≤ allowed amount ≤ billed amount`
-- Read-only SQL enforcement and approved-schema checks
-- GitHub issue-template question parsing
-- Power BI project JSON, pages, measures, and relationships
-
-The latest verified local run completed the pipeline twice consecutively and passed all 22 tests. GitHub Actions independently rebuilds the demo and runs the suite on every push and pull request.
+Free-form questions require `OPENAI_API_KEY`. The assistant accepts only one read-only `SELECT`, checks requested tables and columns against an allowlist, limits results to 200 rows, and displays the SQL with the answer. See the [assistant design notes](docs/ai_architecture.md).
 
 ## Repository guide
 
 ```text
-ai/                Optional analytics assistant and SQL validation
-dashboards/        Generated report previews and BI data marts
-docs/              Requirements, data dictionary, KPI definitions, and UAT plan
+ai/                Assistant logic and SQL validation
+dashboards/        Generated previews and reporting marts
+docs/              Requirements, definitions, walkthrough, and UAT
 etl/               Data generation, loading, validation, and exports
-powerbi/           Power BI project source and report build specification
-snowflake/         Snowflake DDL, load scripts, and quality checks
-sql/               Schema and reusable analysis queries
+powerbi/           Version-controlled Power BI project
+snowflake/         DDL, staged loads, and warehouse quality checks
+sql/               Schema and reusable analytical queries
 tests/             Pipeline, data-quality, assistant, and asset tests
-visualizations/    Reproducible dashboard rendering
+visualizations/    Reproducible preview rendering
 run_pipeline.py    One-command local build
 ```
 
+## Design decisions
+
+- **Reproducibility first:** A fixed seed makes the demo results repeatable.
+- **Business logic in SQL:** Metrics can be inspected and reused outside the dashboard.
+- **Explainable review rules:** Payment-integrity signals remain transparent and auditable.
+- **AI is optional:** The core analysis works without an API key or model access.
+- **Honest deployment boundaries:** SQLite is tested locally; Snowflake is the documented enterprise path.
+
 ## Scope and limitations
 
-- The data is synthetic and does not reproduce a specific payer's policies or contracts.
-- SQLite is the fully tested local warehouse; Snowflake is the documented deployment path.
-- The checked-in Power BI demo uses aggregated public marts; claim-level drill-through remains part of the optional Snowflake deployment path.
-- Review signals are transparent rules, not a trained fraud model.
-- Real healthcare deployment would require PHI controls, access management, audit logging, monitoring, and organizational approval.
+- The dataset is synthetic and does not reproduce a specific payer's contracts, policies, or population.
+- Snowflake assets have not been validated against a live account in this repository.
+- Power BI uses aggregated reporting marts; claim-level drill-through belongs in a secured warehouse deployment.
+- Review indicators are rules for prioritization, not a trained fraud model or fraud determination.
+- A real healthcare deployment would require PHI controls, access management, audit logging, monitoring, and organizational approval.
 
 ## Documentation
 
@@ -206,7 +220,7 @@ run_pipeline.py    One-command local build
 
 ## Other portfolio work
 
-- [AI-Powered Supply Chain Analytics & Workflow Automation](https://github.com/raghuvardhan-mutha/supply-chain-analytics-automation) — automated Gmail-to-PostgreSQL pipeline with n8n, Supabase, supply-chain KPIs, and executive reporting.
+- [Supply Chain Analytics and Workflow Automation](https://github.com/raghuvardhan-mutha/supply-chain-analytics-automation) — an email-to-PostgreSQL workflow using n8n, Supabase, SQL, supply-chain KPIs, and executive reporting.
 
 ## Author
 
