@@ -15,11 +15,17 @@ def test_power_bi_json_assets_are_valid() -> None:
 
 
 def test_power_bi_project_has_expected_pages_and_model() -> None:
+    project_path = POWER_BI / "HealthcareClaimsAnalytics.pbip"
     pages_path = POWER_BI / "HealthcareClaimsAnalytics.Report" / "definition" / "pages" / "pages.json"
     model_path = POWER_BI / "HealthcareClaimsAnalytics.SemanticModel" / "model.bim"
+    project = json.loads(project_path.read_text(encoding="utf-8"))
     pages = json.loads(pages_path.read_text(encoding="utf-8"))
     model = json.loads(model_path.read_text(encoding="utf-8"))["model"]
 
+    assert project["$schema"] == (
+        "https://developer.microsoft.com/json-schemas/fabric/pbip/"
+        "pbipProperties/1.0.0/schema.json"
+    )
     assert len(pages["pageOrder"]) == 5
     assert pages["activePageName"] in pages["pageOrder"]
     assert {table["name"] for table in model["tables"]} == {"Date", "Member", "Provider", "Claim"}
