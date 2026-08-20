@@ -1,5 +1,7 @@
 # Healthcare Claims & Payment Integrity Analytics Platform
 
+**Quick numbers:** 14-table normalized warehouse · 40,514 claims · 5,000 beneficiaries · 400 providers · 30+ SQL analyses · 3 years of claims history (2021–2023)
+
 ![Healthcare Claims Analytics Platform](assets/healthcare-claims-banner.svg)
 
 [![Analytics Pipeline](https://github.com/raghuvardhan-mutha/healthcare-claims-analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/raghuvardhan-mutha/healthcare-claims-analytics/actions/workflows/ci.yml)
