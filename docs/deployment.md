@@ -19,6 +19,6 @@ Connect this GitHub repository, set `streamlit_app.py` as the entry point, and a
 
 ## Snowflake and Power BI
 
-Deploy Snowflake with `snowflake/README.md`, then open `powerbi/HealthcareClaimsAnalytics.pbip` and configure the four Snowflake parameters. Publish to a controlled Power BI workspace only after Desktop refresh, reconciliation, access review, and UAT are complete.
+Open `powerbi/HealthcareClaimsAnalytics.pbip` for the no-login portfolio demo; it imports the six public synthetic data marts from GitHub. Deploy Snowflake separately with `snowflake/README.md` when a credentialed warehouse is available. Publish to a controlled Power BI workspace only after Desktop refresh, reconciliation, access review, and UAT are complete.
 
 Production use additionally requires identity-based access, secrets management, audit logging, monitoring, rate limits, backup/recovery, and organizational privacy/security review.

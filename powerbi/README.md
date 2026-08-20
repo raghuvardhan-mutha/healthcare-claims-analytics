@@ -1,26 +1,22 @@
 # Power BI Desktop project
 
-This folder contains a source-control-friendly Power BI Project (`.pbip`) aligned to the Snowflake star schema. It includes a four-table semantic model, 16 DAX measures, three relationships, parameterized Snowflake Power Query expressions, five named report pages, a professional theme, and a visual build specification.
+This folder contains a source-control-friendly Power BI Project (`.pbip`) for the portfolio demo. Its default Import-mode model reads the six small, synthetic data marts published in this public repository, so a reviewer can open and refresh it without a Snowflake account or password.
 
-## Open and connect
+The project includes six reporting tables, 17 DAX measures, five named report pages, a theme, and a visual build specification. The separate [`../snowflake/`](../snowflake/) folder retains the dimensional Snowflake deployment path for environments where credentials are available.
 
-1. Run the Snowflake setup and load scripts in [`../snowflake/README.md`](../snowflake/README.md).
-2. In current Power BI Desktop on Windows, enable **Power BI Project (.pbip) save option** under **File → Options and settings → Options → Preview features** if your version still requires it.
-3. Open `HealthcareClaimsAnalytics.pbip`.
-4. In **Transform data → Manage parameters**, replace `SnowflakeServer` and `SnowflakeWarehouse`; keep the default database and schema unless you changed them.
-5. Select **Apply changes**, authenticate to Snowflake, then refresh.
-6. Import `healthcare_claims_theme.json` from **View → Themes → Browse for themes**.
-7. Build or refine visuals using `report_build_spec.md`, then save as `.pbip` for source control or `.pbix` for distribution.
+## Open the demo
 
-The repository validates the PBIR structure and all JSON files in CI. A final refresh and visual-render check must be performed in Power BI Desktop because the Linux CI runner cannot host Power BI Desktop or Snowflake credentials.
+1. Download and extract the complete repository outside a OneDrive-synced folder.
+2. Open `HealthcareClaimsAnalytics.pbip` in current Power BI Desktop on Windows.
+3. If Power BI asks for access to `raw.githubusercontent.com`, choose **Anonymous** and set the privacy level to **Public**. No username or password is required.
+4. Select **Refresh** to load the six public synthetic marts.
+5. Import `healthcare_claims_theme.json` from **View → Themes → Browse for themes** if the theme is not already active.
+6. Use `report_build_spec.md` when reviewing or refining the page layouts.
 
-## Model
+The demo intentionally uses aggregated marts rather than patient- or claim-level records. This keeps the download small and makes the public Power BI review path independent of Snowflake credentials.
 
-```mermaid
-erDiagram
-    DATE ||--o{ CLAIM : service_date
-    MEMBER ||--o{ CLAIM : member
-    PROVIDER ||--o{ CLAIM : provider
-```
+## Snowflake deployment
 
-The model uses Import mode for responsive exploration. For production-sized workloads, apply incremental refresh and role-level security after confirming the organization’s retention and access policies.
+For a credentialed deployment, run the files in [`../snowflake/`](../snowflake/) and validate them with `03_quality_checks.sql`. The Snowflake model is an optional deployment target; it is not required to open this PBIP demo.
+
+The repository validates the PBIP/PBIR JSON structure, model object names, table definitions, and measures in CI. Final rendering still requires Power BI Desktop because it is not available on the Linux CI runner.

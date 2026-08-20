@@ -130,14 +130,12 @@ python -m pytest -q
 
 ## Snowflake and Power BI
 
-The repository includes a deployment path rather than credentials or a live warehouse:
+The two review paths are intentionally separate:
 
-1. Follow [`snowflake/README.md`](snowflake/README.md) to create the objects and load the exported files.
-2. Run `snowflake/03_quality_checks.sql` and reconcile the results with the local validation log.
-3. Open [`powerbi/HealthcareClaimsAnalytics.pbip`](powerbi/HealthcareClaimsAnalytics.pbip) in Power BI Desktop on Windows.
-4. Set the Snowflake parameters, refresh the model, and use [`powerbi/report_build_spec.md`](powerbi/report_build_spec.md) for the final visual layout.
+- **Power BI demo:** Open [`powerbi/HealthcareClaimsAnalytics.pbip`](powerbi/HealthcareClaimsAnalytics.pbip) in Power BI Desktop. It loads the six public synthetic data marts from this repository and does not require a Snowflake account. If prompted for the public GitHub data source, select **Anonymous** and **Public**.
+- **Snowflake deployment:** Follow [`snowflake/README.md`](snowflake/README.md) to create and load the dimensional model, then run `snowflake/03_quality_checks.sql`.
 
-The repository validates the Power BI JSON structure in CI. A credentialed Snowflake refresh and final Desktop rendering must be completed in the target environment.
+The repository validates the Power BI JSON and model structure in CI. Final visual rendering is reviewed in Power BI Desktop because Desktop is unavailable on the Linux CI runner.
 
 ## Optional analytics assistant
 
@@ -190,7 +188,7 @@ run_pipeline.py    One-command local build
 
 - The data is synthetic and does not reproduce a specific payer's policies or contracts.
 - SQLite is the fully tested local warehouse; Snowflake is the documented deployment path.
-- The checked-in Power BI source includes the semantic model and report scaffold, but final credentialed refresh and visual review require Power BI Desktop.
+- The checked-in Power BI demo uses aggregated public marts; claim-level drill-through remains part of the optional Snowflake deployment path.
 - Review signals are transparent rules, not a trained fraud model.
 - Real healthcare deployment would require PHI controls, access management, audit logging, monitoring, and organizational approval.
 
