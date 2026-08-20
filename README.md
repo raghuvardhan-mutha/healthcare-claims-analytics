@@ -204,10 +204,15 @@ run_pipeline.py    One-command local build
 - [UAT plan](docs/uat_test_plan.md)
 - [Deployment guide](docs/deployment.md)
 
+## Other portfolio work
+
+- [AI-Powered Supply Chain Analytics & Workflow Automation](https://github.com/raghuvardhan-mutha/supply-chain-analytics-automation) — automated Gmail-to-PostgreSQL pipeline with n8n, Supabase, supply-chain KPIs, and executive reporting.
+
 ## Author
 
 **Raghu Vardhan Mutha**  
-Data Analyst | Healthcare Claims | SQL | Snowflake | Power BI
+Data Analyst | Healthcare Claims | SQL | Snowflake | Power BI  
+[LinkedIn](https://www.linkedin.com/in/raghuvardhandataanalyst/) · [GitHub](https://github.com/raghuvardhan-mutha)
 
 ## License
 
