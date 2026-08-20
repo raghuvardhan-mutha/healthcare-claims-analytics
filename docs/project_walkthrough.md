@@ -4,7 +4,7 @@ This guide provides a concise path for reviewers, hiring teams, and contributors
 
 ## One-minute overview
 
-The platform generates deterministic synthetic Medicare-style claims, loads them into a normalized SQLite warehouse, validates the data, produces reusable SQL analysis and BI-ready marts, and exposes a guarded natural-language analytics assistant. The focus is healthcare operational and financial decision support—not clinical decision-making.
+I built this project around a practical claims-analysis workflow: generate a consistent synthetic dataset, load and validate it, define reusable metrics in SQL, and prepare the results for reporting. SQLite makes the full example easy to reproduce locally; the Snowflake scripts and Power BI source show how the same model can be deployed in a BI environment. The optional assistant is a secondary interface over the validated warehouse.
 
 ## Recommended review path
 
@@ -12,9 +12,8 @@ The platform generates deterministic synthetic Medicare-style claims, loads them
 2. Review the [dashboard gallery](../README.md#dashboard-gallery).
 3. Inspect the [schema](../sql/01_schema.sql) and [data dictionary](data_dictionary.md).
 4. Open one SQL domain, such as [payment integrity](../sql/06_fraud_detection.sql).
-5. Review the [AI guard](../ai/sql_guard.py) and [semantic layer](../ai/semantic_layer.json).
-6. Run the pipeline and tests.
-7. Launch the Streamlit application and try a built-in question.
+5. Run the pipeline and tests.
+6. Review the Power BI model or the optional assistant only if it is relevant to the role.
 
 ## Business scenario
 
@@ -70,6 +69,8 @@ For a free-form question, configure `OPENAI_API_KEY` privately. The assistant wi
 - **AI governance:** Constrain the model with approved tables and metrics, validate SQL, execute read-only, and show the query to the user.
 - **Limitation:** Synthetic results demonstrate the method; real operational decisions require policy, contract, coding, clinical, and medical-record evidence.
 
-## Suggested next extension
+## Next deployment checks
 
-The highest-value portfolio extension is a native Power BI or Tableau workbook built on `dashboards/data_marts/`, followed by a hosted Streamlit demo. Those additions would make the existing analytical and AI work directly explorable by recruiters.
+- Execute the supplied DDL, load, and quality scripts in a credentialed Snowflake account.
+- Refresh the semantic model in Power BI Desktop and complete the visual-layout review.
+- Publish the Streamlit interface only if a hosted demonstration is useful for the intended audience.

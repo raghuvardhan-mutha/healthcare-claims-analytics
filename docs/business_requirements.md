@@ -30,6 +30,14 @@ Provide a reproducible analytics platform for synthetic healthcare claims that h
 - Power BI artifacts must be text-based, versionable, and statically validated.
 - Deployment must be reproducible through local Python or Docker.
 
-## Acceptance criteria
+## Acceptance criteria and current status
 
-The project is release-ready when the pipeline completes, tests pass, Snowflake validation queries return no violations, Power BI Desktop refresh succeeds with configured credentials, UAT scenarios pass, and documentation matches the implemented state.
+| Criterion | Status | Evidence |
+|---|---|---|
+| Local pipeline completes from a clean environment | Passed | `run_pipeline.py` and `docs/etl_validation_log.md` |
+| Automated tests pass | Passed | pytest and the `analytics-pipeline` GitHub Actions workflow |
+| Generated results reconcile to source data | Passed | Row-count and financial validation checks |
+| Snowflake scripts execute in a configured account | Environment validation required | `snowflake/00_setup.sql` through `snowflake/03_quality_checks.sql` |
+| Power BI refreshes against the configured Snowflake model | Desktop validation required | `powerbi/HealthcareClaimsAnalytics.pbip` and the UAT plan |
+
+The repository is complete as a reproducible local portfolio demonstration. Credentialed Snowflake execution and Power BI Desktop rendering are intentionally recorded as deployment checks instead of being represented as automated CI results.
